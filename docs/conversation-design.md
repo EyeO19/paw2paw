@@ -28,7 +28,7 @@ Hard delete would harm accountability and user trust if someone needs to re-read
 
 - Channel name: `conversation:{threadId}` for readable Supabase logs.
 - Subscribe to `INSERT` on `public.messages` filtered by `thread_id`.
-- **Publication:** enable `messages` on the `supabase_realtime` publication in the Supabase dashboard.
+- **Publication:** migration `0009_enable_realtime.sql` runs `ALTER PUBLICATION supabase_realtime ADD TABLE public.messages` (not a dashboard change).
 - **Reconnect:** on resubscribe after disconnect, refetch messages and merge by `id` (do not blind-append duplicates).
 - Subscription remains active when `closed` so a last message can arrive before both clients reflect the ended state.
 

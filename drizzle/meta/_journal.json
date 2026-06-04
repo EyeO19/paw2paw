@@ -64,6 +64,13 @@
       "when": 1781227200000,
       "tag": "0008_close_thread_rpc",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1781313600000,
+      "tag": "0009_enable_realtime",
+      "breakpoints": true
     }
   ]
 }
