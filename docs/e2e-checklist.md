@@ -75,6 +75,32 @@ Use two browser sessions (or normal + incognito) as **Writer** and **Responder**
 
 ---
 
+---
+
+## Chunk 5 — Safety + inbox (partial)
+
+### Crisis strip + interstitial (Commit 1)
+
+- [ ] `/compose` and conversation show 988 + campus strip without sending
+- [ ] Phrase e.g. “I want to kill myself” → interstitial → **Send anyway** sends; **Not right now** clears text
+- [ ] Same phrase in same tab session → no second interstitial
+- [ ] “thoughts of suicide” in message → **no** interstitial (strip only)
+- [ ] Dev console: `[analytics]` events without message body
+
+### Report message (Commit 2)
+
+- [ ] **Report** on other party’s message → toast success → label **Reported**
+- [ ] Supabase: `messages.flagged = true` for that row
+- [ ] Non-participant cannot flag (RLS / action returns error toast)
+- [ ] Already-flagged message hides Report button
+
+### Inbox (Commit 3 — when shipped)
+
+- [ ] `/inbox` lists writer + responder threads
+- [ ] Links open correct `/thread/[id]`
+
+---
+
 ## Sign-off
 
 | Tester | Date | Pass/Fail | Notes |

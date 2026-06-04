@@ -7,6 +7,7 @@ export type ConversationMessage = {
   content: string;
   createdAt: string;
   deliveryStatus: MessageDeliveryStatus;
+  flagged: boolean;
 };
 
 export function sortMessages(a: ConversationMessage, b: ConversationMessage): number {
@@ -24,6 +25,7 @@ export function mapRowToMessage(row: {
   sender_id: string;
   content: string;
   created_at: string;
+  flagged?: boolean;
 }): ConversationMessage {
   return {
     id: row.id,
@@ -32,6 +34,7 @@ export function mapRowToMessage(row: {
     content: row.content,
     createdAt: row.created_at,
     deliveryStatus: "sent",
+    flagged: row.flagged ?? false,
   };
 }
 

@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 
 import { endConversation } from "@/app/actions/conversation";
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import { trackEvent } from "@/lib/analytics/track";
 import { conversationCopy } from "@/lib/copy/conversation";
 
 type EndConversationButtonProps = {
@@ -30,6 +32,7 @@ export function EndConversationButton({
         setError(result.error);
         return;
       }
+      trackEvent(ANALYTICS_EVENTS.conversationEnded, { thread_id: threadId });
       onEnded();
     });
   };

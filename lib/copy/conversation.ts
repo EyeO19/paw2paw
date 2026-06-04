@@ -24,6 +24,16 @@ export const conversationCopy = {
     retry: "Retry",
     you: "You",
     other: "Them",
+    report: "Report",
+    reporting: "Reporting…",
+    reported: "Reported",
+  },
+  report: {
+    toastSuccess: "Thanks — we've noted this message for review.",
+    toastError: "Couldn't submit a report. Try again.",
+  },
+  toast: {
+    dismiss: "Dismiss",
   },
   errors: {
     generic: "Something went wrong. Please try again.",

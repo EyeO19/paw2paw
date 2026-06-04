@@ -6,4 +6,4 @@
 | 2 | Write flow (compose + pending) | Done |
 | 3 | Match flow + responder side | Done |
 | 4 | Conversation + realtime + end conversation | Done (E2E signed off) |
-| 5 | Crisis interstitial + safety UX | Planned |
+| 5 | Crisis interstitial + safety UX | In progress (Commits 1–2 done; inbox pending) |

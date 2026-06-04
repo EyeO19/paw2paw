@@ -21,6 +21,7 @@ type MessageRow = {
   sender_id: string;
   content: string;
   created_at: string;
+  flagged: boolean;
 };
 
 export default async function ThreadPage({ params }: ThreadPageProps) {
@@ -57,7 +58,7 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
 
   const { data: messageRows } = await supabase
     .from("messages")
-    .select("id, thread_id, sender_id, content, created_at")
+    .select("id, thread_id, sender_id, content, created_at, flagged")
     .eq("thread_id", id)
     .order("created_at", { ascending: true })
     .order("id", { ascending: true });

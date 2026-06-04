@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CrisisInterstitial } from "@/app/components/crisis-interstitial";
 import { CrisisResourceStrip } from "@/app/components/crisis-resource-strip";
-import { sendMessage } from "@/app/actions/conversation";
+import { flagMessage, sendMessage } from "@/app/actions/conversation";
 import { Composer } from "@/app/thread/[id]/composer";
 import { Message } from "@/app/thread/[id]/message";
 import { useCrisisSendGate } from "@/lib/crisis/use-crisis-send-gate";
@@ -34,6 +34,7 @@ type MessageRow = {
   sender_id: string;
   content: string;
   created_at: string;
+  flagged: boolean;
 };
 
 export function ConversationView({
@@ -46,6 +47,7 @@ export function ConversationView({
     [...initialMessages].sort(sortMessages),
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const wasConnectedRef = useRef(false);
   const supabaseRef = useRef(createClient());
@@ -63,7 +65,7 @@ export function ConversationView({
   const fetchAndMergeMessages = useCallback(async () => {
     const { data, error } = await supabaseRef.current
       .from("messages")
-      .select("id, thread_id, sender_id, content, created_at")
+      .select("id, thread_id, sender_id, content, created_at, flagged")
       .eq("thread_id", threadId)
       .order("created_at", { ascending: true })
       .order("id", { ascending: true });
@@ -147,6 +149,7 @@ export function ConversationView({
       content,
       createdAt: new Date().toISOString(),
       deliveryStatus: "sending",
+      flagged: false,
     };
 
     setMessages((current) => upsertMessages(current, [optimistic]));
@@ -175,6 +178,7 @@ export function ConversationView({
       content,
       createdAt: optimistic.createdAt,
       deliveryStatus: "sent",
+      flagged: false,
     };
 
     setMessages((current) => {
@@ -205,6 +209,23 @@ export function ConversationView({
     onClearComposer: () => clearComposerRef.current?.(),
   });
 
+  const handleReport = async (messageId: string) => {
+    const result = await flagMessage({ messageId, threadId });
+
+    if (!result.ok) {
+      setToast(result.error);
+      return;
+    }
+
+    setMessages((current) =>
+      current.map((message) =>
+        message.id === messageId ? { ...message, flagged: true } : message,
+      ),
+    );
+    setToast(conversationCopy.report.toastSuccess);
+    trackEvent(ANALYTICS_EVENTS.messageReported, { thread_id: threadId });
+  };
+
   const handleRetry = (failedMessage: ConversationMessage) => {
     setMessages((current) =>
       current.filter((message) => message.id !== failedMessage.id),
@@ -221,6 +242,21 @@ export function ConversationView({
         onContinue={handleContinue}
         onExit={handleExit}
       />
+      {toast ? (
+        <div
+          className="flex items-center justify-between gap-3 border-b border-zinc-200 bg-zinc-100 px-4 py-2 text-sm text-zinc-800"
+          role="status"
+        >
+          <span>{toast}</span>
+          <button
+            type="button"
+            onClick={() => setToast(null)}
+            className="text-xs font-medium underline"
+          >
+            {conversationCopy.toast.dismiss}
+          </button>
+        </div>
+      ) : null}
       {isClosed ? (
         <div
           className="border-b border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
@@ -238,7 +274,9 @@ export function ConversationView({
             key={message.id}
             message={message}
             isMine={message.senderId === currentUserId}
+            canReport
             onRetry={handleRetry}
+            onReport={handleReport}
           />
         ))}
       </div>

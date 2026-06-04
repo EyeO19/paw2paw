@@ -56,6 +56,27 @@ Static campus resources live in `lib/constants/resources.ts`, rendered above/out
 - **Phrase interstitial** (high-specificity patterns in `lib/constants/crisis-phrases.ts`): non-blocking; Continue sends; Exit clears composer. No message body logging or analytics content fields.
 - Explicit phrases like “thoughts of suicide” are **excluded** so legitimate disclosure on-platform is not interrupted.
 
+## Sender-side vs receiver-side (Chunk 6+ — open question)
+
+**Current (Chunk 5):** The phrase interstitial is a **sender-side** moment of self-reflection before send. The responder sees the message as a normal bubble — no badge, no elevated resource strip, no “flagged content” signal.
+
+**Why not receiver warnings now**
+
+- A matched regex + “Continue” is **not** a clinical risk classification; showing “extra care” to the peer could feel like surveillance or stigma.
+- Legitimate disclosure (“I want to kill myself” is intentionally *not* in the list) and high-specificity crisis phrases are different; receiver UI conflates them.
+- Paw2Paw values **dignity in the conversation** — the resource strip is always available to *both* parties without labeling one message as dangerous.
+
+**Chunk 6+ options to evaluate (if ever)**
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| No receiver change (status quo) | Simplest; preserves symmetry | Responder may miss that peer is in distress |
+| Passive: resource strip expanded by default on thread open | No message-level label | Doesn’t tie to specific content |
+| “Extra care” badge on message | Signals context | Leaks sender’s crisis language; dignity risk |
+| Server-side flag on send (separate from `messages.flagged`) | Could power moderator tools | Scope creep; must not log content |
+
+**Working framing for case study / interviews:** *We treated the interstitial as a sender-side moment of self-reflection, not a receiver-side warning, to preserve dignity in the conversation.*
+
 ## Out of scope (Chunk 4)
 
 - Read receipts, typing indicators, push notifications
