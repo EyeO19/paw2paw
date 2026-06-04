@@ -36,6 +36,20 @@
       "when": 1780881600000,
       "tag": "0004_create_thread_with_message",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1780968000000,
+      "tag": "0005_claim_thread_rpc",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1781054400000,
+      "tag": "0006_rls_match_flow",
+      "breakpoints": true
     }
   ]
 }

@@ -31,3 +31,4 @@ alwaysApply: true
 - Never commit secrets — use .env.local
 - Postgres: `DATABASE_URL` = Transaction pooler :6543 (app); `DATABASE_MIGRATE_URL` = Session pooler :5432 (migrate/studio; avoid Direct — IPv6-only on many projects)
 - Auth: Supabase email/password; `SIGN_DISPLAY_ID_SECRET` for display ID hashing; profile via `ensureUserProfile` on signUp (if session) + signIn (always); disable Confirm email in dev, signIn still upserts for production
+- Match flow: FIFO browse on `/respond` (`topic_tags &&` overlap); claim via `claim_thread_for_responder` RPC; browse RLS `threads_select_claimable` + `messages_select_on_claimable_thread`; v2 design in `docs/matching.md`

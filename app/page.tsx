@@ -4,6 +4,7 @@ import { LogoutButton } from "@/app/components/logout-button";
 import { needsOnboarding } from "@/lib/auth/onboarding";
 import { authCopy } from "@/lib/copy/auth";
 import { composeCopy } from "@/lib/copy/compose";
+import { respondCopy } from "@/lib/copy/respond";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Home() {
@@ -13,15 +14,18 @@ export default async function Home() {
   } = await supabase.auth.getUser();
 
   let showNewConversation = false;
+  let showRespond = false;
 
   if (user) {
     const { data: profile } = await supabase
       .from("users")
-      .select("topic_tags")
+      .select("topic_tags, opt_in_responder")
       .eq("id", user.id)
       .maybeSingle();
 
-    showNewConversation = !needsOnboarding(profile);
+    const onboarded = !needsOnboarding(profile);
+    showNewConversation = onboarded;
+    showRespond = onboarded && Boolean(profile?.opt_in_responder);
   }
 
   return (
@@ -35,6 +39,14 @@ export default async function Home() {
               className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white"
             >
               {composeCopy.home.newConversation}
+            </Link>
+          ) : null}
+          {showRespond ? (
+            <Link
+              href="/respond"
+              className="text-sm font-medium text-zinc-900 underline"
+            >
+              {respondCopy.home.respondToSomeone}
             </Link>
           ) : null}
           <LogoutButton />
