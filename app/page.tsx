@@ -4,6 +4,7 @@ import { LogoutButton } from "@/app/components/logout-button";
 import { needsOnboarding } from "@/lib/auth/onboarding";
 import { authCopy } from "@/lib/copy/auth";
 import { composeCopy } from "@/lib/copy/compose";
+import { inboxCopy } from "@/lib/copy/inbox";
 import { respondCopy } from "@/lib/copy/respond";
 import { createClient } from "@/lib/supabase/server";
 
@@ -34,12 +35,20 @@ export default async function Home() {
       {user ? (
         <div className="flex flex-col items-center gap-4">
           {showNewConversation ? (
-            <Link
-              href="/compose"
-              className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white"
-            >
-              {composeCopy.home.newConversation}
-            </Link>
+            <>
+              <Link
+                href="/compose"
+                className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white"
+              >
+                {composeCopy.home.newConversation}
+              </Link>
+              <Link
+                href="/inbox"
+                className="text-sm font-medium text-zinc-900 underline"
+              >
+                {inboxCopy.home.myConversations}
+              </Link>
+            </>
           ) : null}
           {showRespond ? (
             <Link

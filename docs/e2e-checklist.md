@@ -94,7 +94,7 @@ Use two browser sessions (or normal + incognito) as **Writer** and **Responder**
 - [ ] Non-participant cannot flag (RLS / action returns error toast)
 - [ ] Already-flagged message hides Report button
 
-### Inbox (Commit 3 — when shipped)
+### Inbox (Commit 3)
 
 - [ ] `/inbox` lists writer + responder threads
 - [ ] Links open correct `/thread/[id]`
