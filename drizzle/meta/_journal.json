@@ -22,6 +22,20 @@
       "when": 1780708800000,
       "tag": "0002_responder_opt_in",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1780795200000,
+      "tag": "0003_thread_topic_tags",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780881600000,
+      "tag": "0004_create_thread_with_message",
+      "breakpoints": true
     }
   ]
 }

@@ -49,6 +49,10 @@ export const threads = pgTable(
     responderId: uuid("responder_id").references(() => users.id, {
       onDelete: "restrict",
     }),
+    topicTags: text("topic_tags")
+      .array()
+      .default(sql`'{}'::text[]`)
+      .notNull(),
   },
   (table) => [
     index("threads_status_created_at_idx").on(table.status, table.createdAt),
