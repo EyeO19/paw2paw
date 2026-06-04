@@ -50,6 +50,20 @@
       "when": 1781054400000,
       "tag": "0006_rls_match_flow",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1781140800000,
+      "tag": "0007_send_message_rpc",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1781227200000,
+      "tag": "0008_close_thread_rpc",
+      "breakpoints": true
     }
   ]
 }
