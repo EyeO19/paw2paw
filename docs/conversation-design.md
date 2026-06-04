@@ -48,7 +48,13 @@ Auto-scroll to the latest message only when the user is already **near the botto
 
 ## Resource bridge
 
-Static campus resources live in `lib/constants/resources.ts`, rendered above/outside the message stream (collapsible on mobile, sidebar on desktop). Reused for crisis interstitial in a later chunk.
+Static campus resources live in `lib/constants/resources.ts`, rendered above/outside the message stream (collapsible on mobile, sidebar on desktop).
+
+## Crisis safety (Chunk 5)
+
+- **Always-visible strip** on `/compose` and conversation composer: 988 + campus links (`CrisisResourceStrip`).
+- **Phrase interstitial** (high-specificity patterns in `lib/constants/crisis-phrases.ts`): non-blocking; Continue sends; Exit clears composer. No message body logging or analytics content fields.
+- Explicit phrases like “thoughts of suicide” are **excluded** so legitimate disclosure on-platform is not interrupted.
 
 ## Out of scope (Chunk 4)
 

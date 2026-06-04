@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type KeyboardEvent } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
 
 import { conversationCopy } from "@/lib/copy/conversation";
 
@@ -10,10 +10,20 @@ type ComposerProps = {
   disabled: boolean;
   isSubmitting: boolean;
   onSend: (content: string) => void;
+  onRegisterClear?: (clear: () => void) => void;
 };
 
-export function Composer({ disabled, isSubmitting, onSend }: ComposerProps) {
+export function Composer({
+  disabled,
+  isSubmitting,
+  onSend,
+  onRegisterClear,
+}: ComposerProps) {
   const [value, setValue] = useState("");
+
+  useEffect(() => {
+    onRegisterClear?.(() => setValue(""));
+  }, [onRegisterClear]);
 
   const handleSend = () => {
     const trimmed = value.trim();

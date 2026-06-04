@@ -2,9 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { CrisisInterstitial } from "@/app/components/crisis-interstitial";
+import { CrisisResourceStrip } from "@/app/components/crisis-resource-strip";
 import { sendMessage } from "@/app/actions/conversation";
 import { Composer } from "@/app/thread/[id]/composer";
 import { Message } from "@/app/thread/[id]/message";
+import { useCrisisSendGate } from "@/lib/crisis/use-crisis-send-gate";
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import { trackEvent } from "@/lib/analytics/track";
 import {
   mapRowToMessage,
   removeTempDuplicate,
@@ -129,7 +134,7 @@ export function ConversationView({
     maybeScrollToBottom();
   }, [messages, maybeScrollToBottom]);
 
-  const handleSend = async (content: string) => {
+  const handleSendInternal = async (content: string) => {
     if (threadStatus !== "matched" || isSubmitting) {
       return;
     }
@@ -176,19 +181,46 @@ export function ConversationView({
       const withoutTemp = current.filter((message) => message.id !== tempId);
       return removeTempDuplicate(withoutTemp, confirmed);
     });
+
+    trackEvent(ANALYTICS_EVENTS.messageSent, {
+      source: "conversation",
+      thread_id: threadId,
+    });
   };
+
+  const clearComposerRef = useRef<(() => void) | null>(null);
+
+  const {
+    requestSend,
+    interstitialOpen,
+    handleContinue,
+    handleExit,
+  } = useCrisisSendGate({
+    surfaceId: threadId,
+    surface: "conversation",
+    threadId,
+    onProceed: (content) => {
+      void handleSendInternal(content);
+    },
+    onClearComposer: () => clearComposerRef.current?.(),
+  });
 
   const handleRetry = (failedMessage: ConversationMessage) => {
     setMessages((current) =>
       current.filter((message) => message.id !== failedMessage.id),
     );
-    void handleSend(failedMessage.content);
+    requestSend(failedMessage.content);
   };
 
   const isClosed = threadStatus === "closed";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
+      <CrisisInterstitial
+        open={interstitialOpen}
+        onContinue={handleContinue}
+        onExit={handleExit}
+      />
       {isClosed ? (
         <div
           className="border-b border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
@@ -211,13 +243,19 @@ export function ConversationView({
         ))}
       </div>
       {!isClosed ? (
-        <Composer
-          disabled={false}
-          isSubmitting={isSubmitting}
-          onSend={(content) => {
-            void handleSend(content);
-          }}
-        />
+        <>
+          <div className="border-t border-zinc-200 px-4 pt-4">
+            <CrisisResourceStrip surface="conversation" threadId={threadId} />
+          </div>
+          <Composer
+            disabled={false}
+            isSubmitting={isSubmitting}
+            onSend={requestSend}
+            onRegisterClear={(clear) => {
+              clearComposerRef.current = clear;
+            }}
+          />
+        </>
       ) : null}
     </div>
   );
