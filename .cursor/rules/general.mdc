@@ -30,3 +30,4 @@ alwaysApply: true
 - After any architectural change, update this file
 - Never commit secrets — use .env.local
 - Postgres: `DATABASE_URL` = Transaction pooler :6543 (app); `DATABASE_MIGRATE_URL` = Session pooler :5432 (migrate/studio; avoid Direct — IPv6-only on many projects)
+- Auth: Supabase email/password; `SIGN_DISPLAY_ID_SECRET` for display ID hashing; profile via `ensureUserProfile` on signUp (if session) + signIn (always); disable Confirm email in dev, signIn still upserts for production
