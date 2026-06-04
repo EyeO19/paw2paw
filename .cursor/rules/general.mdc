@@ -1,0 +1,32 @@
+---
+description: Paw2Paw — anonymous peer messaging platform for marginalized Princeton students
+alwaysApply: true
+---
+
+# Stack
+- Next.js 16 with App Router (no Pages Router)
+- TypeScript strict mode
+- Tailwind CSS v4
+- shadcn/ui for components
+- Supabase (Postgres + Auth + Realtime)
+- Drizzle ORM
+- Vercel for deployment
+- Target: responsive web platform (mobile-first, desktop-supported)
+
+# Architecture rules
+- Server Components by default; only use 'use client' when truly necessary (forms, hooks, interactivity)
+- Row-Level Security policies are the source of truth for authorization, never application code
+- Never log message content. PII must be hashed at the boundary.
+- All user-facing copy lives in dedicated files (no inline strings in components)
+
+# Code style
+- kebab-case for files, PascalCase for components
+- Functional components only
+- Always add loading and error states to async UI
+- Zod for runtime validation, especially at API boundaries
+
+# Workflow
+- Before writing code, propose a plan and wait for approval
+- After any architectural change, update this file
+- Never commit secrets — use .env.local
+- Postgres: `DATABASE_URL` = Transaction pooler :6543 (app); `DATABASE_MIGRATE_URL` = Session pooler :5432 (migrate/studio; avoid Direct — IPv6-only on many projects)
