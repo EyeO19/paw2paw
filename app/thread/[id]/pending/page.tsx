@@ -70,12 +70,17 @@ export default async function ThreadPendingPage({ params }: PendingPageProps) {
             </ul>
           </div>
         ) : null}
-        <Link
-          href="/"
-          className="text-sm font-medium text-zinc-900 underline"
-        >
-          {composeCopy.pending.homeLink}
-        </Link>
+        <div className="flex flex-col items-center gap-2 text-sm">
+          <Link
+            href="/inbox"
+            className="font-medium text-zinc-900 underline"
+          >
+            {composeCopy.pending.inboxLink}
+          </Link>
+          <Link href="/" className="text-zinc-600 underline">
+            {composeCopy.pending.homeLink}
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -11,8 +11,9 @@ export const composeCopy = {
   },
   pending: {
     title: "Message sent",
-    body: "We'll find someone who gets it. We'll notify you when someone responds.",
+    body: "Your message is waiting for a peer who shares your tags. Check your inbox — when someone responds, the conversation will appear here. Most threads get a reply within a few hours, but some take longer.",
     topicsLabel: "Topics for this conversation",
+    inboxLink: "View my inbox",
     homeLink: "Back home",
   },
   home: {
