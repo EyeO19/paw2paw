@@ -88,14 +88,35 @@ Append-only log of notable decisions. Add a new entry when you make a call worth
 
 ---
 
-## 2025-06 — Profile row created on first sign-in, not signup
+## Decision: Profile row created on first sign-in, not signup
 
-**Context:** Supabase Auth and our `public.users` table are separate schemas. Profile (`hashed_display_id`, `topic_tags`) lives in `public.users`. With email confirmation enabled, signup often returns no session.
+**Context:** Supabase Auth manages `auth.users` (email, password, session). Our app data
+lives in `public.users` (hashed_display_id, topic_tags, opt_in_responder). These are
+separate schemas linked by a foreign key on `id`.
 
 **Tradeoffs considered:**
-- Create profile on signup — no orphan window between `auth.users` and `public.users`
-- Create profile on first sign-in — cleaner separation of auth vs profile; no rows for users who never confirm
 
-**Choice:** On first sign-in (`ensureUserProfile` after `signInWithPassword`, and on signup only when a session is present). Brief window where `auth.users` exists without `public.users` between signup and email confirmation is acceptable.
+- **Option A — create profile on signup (atomic).** No orphan window. But requires
+  wrapping signUp + insert in a transaction or trigger; if the insert fails after auth
+  succeeds, we have an auth user with no profile and no clean rollback. Also creates
+  rows for users who never confirm their email, accumulating garbage.
 
-**At 10× scale:** Cleanup job to delete orphan `auth.users` with no `public.users` after 7 days to prevent garbage accumulation.
+- **Option B — create profile on first sign-in (chosen).** Clean separation: auth
+  concerns stay in auth, profile concerns stay in public. Orphan window exists between
+  signup and first sign-in (could be minutes, could be never if user abandons). For
+  unconfirmed users, only the auth row exists — easier to garbage-collect.
+
+- **Option C — create profile via Supabase Auth Hook.** Possible but adds vendor-specific
+  glue and obscures the flow. Defer until we need server-side automation that signup +
+  first-sign-in can't cover.
+
+**Choice:** Option B. The orphan window is bounded and observable; the alternative
+hides failure modes inside a transaction we'd have to maintain ourselves.
+
+**At 10× scale:** Add a nightly cleanup job that deletes `auth.users` rows where no
+`public.users` exists after 7 days. Prevents accumulation of abandoned signups without
+affecting users mid-onboarding.
+
+**Revisit if:** We add Sign in with Google / Apple. SSO providers may create profile
+rows synchronously, in which case Option A becomes cheap. At that point, evaluate
+unifying the two paths.
