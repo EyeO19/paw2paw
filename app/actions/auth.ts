@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 
 import { ensureUserProfile } from "@/lib/auth/ensure-user-profile";
 import { redirectAfterAuthenticatedSession } from "@/lib/auth/redirect-after-auth";
+import { safeInternalPath } from "@/lib/auth/safe-internal-path";
 import { authCopy } from "@/lib/copy/auth";
+import { settingsCopy } from "@/lib/copy/settings";
 import {
   onboardingSchema,
   signInSchema,
@@ -137,4 +139,57 @@ export async function completeOnboarding(
   }
 
   redirect("/");
+}
+
+export async function updateProfile(
+  _prevState: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const topicTags = formData.getAll("topicTags").map(String);
+  const optInResponder = formData.get("optInResponder") === "on";
+  const returnTo = safeInternalPath(formData.get("from"));
+
+  const parsed = onboardingSchema.safeParse({ topicTags, optInResponder });
+
+  if (!parsed.success) {
+    return {
+      error: parsed.error.issues[0]?.message ?? settingsCopy.errors.generic,
+    };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data: before } = await supabase
+    .from("users")
+    .select("opt_in_responder")
+    .eq("id", user.id)
+    .single();
+
+  const { error } = await supabase
+    .from("users")
+    .update({
+      topic_tags: parsed.data.topicTags,
+      opt_in_responder: parsed.data.optInResponder,
+    })
+    .eq("id", user.id);
+
+  if (error) {
+    return { error: settingsCopy.errors.generic };
+  }
+
+  const wasOptedIn = Boolean(before?.opt_in_responder);
+  const nowOptedIn = parsed.data.optInResponder;
+
+  if (nowOptedIn && !wasOptedIn) {
+    redirect("/respond");
+  }
+
+  redirect(returnTo);
 }

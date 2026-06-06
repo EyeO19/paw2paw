@@ -11,8 +11,7 @@ export const respondCopy = {
   },
   optIn: {
     title: "Opt in to respond",
-    body: "Turn on responder mode in your profile to browse and claim conversations.",
-    cta: "Update profile",
+    body: "Turn on responder mode in settings to browse and claim conversations.",
   },
   thread: {
     matchedTitle: "Conversation matched",

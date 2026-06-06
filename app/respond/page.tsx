@@ -44,7 +44,7 @@ export default async function RespondPage() {
   if (!profile?.opt_in_responder) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-16">
-        <OptInPrompt />
+        <OptInPrompt optInResponder={false} />
       </div>
     );
   }
