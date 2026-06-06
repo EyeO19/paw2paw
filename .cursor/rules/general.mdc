@@ -6,8 +6,7 @@ alwaysApply: true
 # Stack
 - Next.js 16 with App Router (no Pages Router)
 - TypeScript strict mode
-- Tailwind CSS v4
-- Custom components built on Tailwind v4 (shadcn/ui adoption deferred to P2 polish phase per docs/roadmap-resume.md)
+- Tailwind CSS v4 — custom components (shadcn/ui adoption deferred to P2 polish phase per docs/roadmap-resume.md)
 - Supabase (Postgres + Auth + Realtime)
 - Drizzle ORM
 - Vercel for deployment
