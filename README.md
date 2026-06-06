@@ -92,3 +92,7 @@ Resume and shipping priorities: [docs/roadmap-resume.md](docs/roadmap-resume.md)
 ## Security
 
 Threat model, RLS summary, and responsible disclosure: [SECURITY.md](SECURITY.md).
+
+## License
+
+MIT — see [LICENSE](LICENSE).
