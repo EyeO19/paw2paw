@@ -85,3 +85,17 @@ Append-only log of notable decisions. Add a new entry when you make a call worth
 - HMAC hashed display ID with server secret — stable, non-reversible, no PII in `users` row
 
 **At 10× scale:** Rotate secret strategy documented; never expose hash to client analytics; rate-limit account creation if abuse appears.
+
+---
+
+## 2025-06 — Profile row created on first sign-in, not signup
+
+**Context:** Supabase Auth and our `public.users` table are separate schemas. Profile (`hashed_display_id`, `topic_tags`) lives in `public.users`. With email confirmation enabled, signup often returns no session.
+
+**Tradeoffs considered:**
+- Create profile on signup — no orphan window between `auth.users` and `public.users`
+- Create profile on first sign-in — cleaner separation of auth vs profile; no rows for users who never confirm
+
+**Choice:** On first sign-in (`ensureUserProfile` after `signInWithPassword`, and on signup only when a session is present). Brief window where `auth.users` exists without `public.users` between signup and email confirmation is acceptable.
+
+**At 10× scale:** Cleanup job to delete orphan `auth.users` with no `public.users` after 7 days to prevent garbage accumulation.

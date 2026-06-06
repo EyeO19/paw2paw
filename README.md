@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Paw2Paw
 
-## Getting Started
+**Status:** MVP in dev — production deploy in progress.
 
-First, run the development server:
+Paw2Paw is an anonymous peer-support messaging platform for Princeton students. Marginalized students — first-gen, neurodivergent, students of color, student-athletes, LGBTQ+, international — get less mental health support at elite institutions because everyone assumes they're fine. Paw2Paw pairs students with peers who share their identity tags, anonymously, for one-to-one conversations with crisis resources always one tap away. Authorization is enforced at the database via Postgres RLS, not application code.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+**Live demo:** coming soon — URL and Loom walkthrough will be added after deploy.
+
+## Architecture
+
+```mermaid
+flowchart TB
+  subgraph browser["Browser"]
+    CC["Client Components<br/>conversation-view, compose-form,<br/>crisis-interstitial, realtime subscribe"]
+    BC["createBrowserClient()<br/>lib/supabase/client.ts<br/>anon key + session in memory"]
+    CC --> BC
+  end
+
+  subgraph edge["Next.js edge"]
+    MW["middleware.ts<br/>session refresh + auth gating"]
+  end
+
+  subgraph server["Next.js server"]
+    SC["Server Components<br/>page.tsx, inbox, respond"]
+    SA["Server Actions<br/>auth, thread, conversation, respond"]
+    SSC["createServerClient()<br/>lib/supabase/server.ts<br/>anon key + auth cookies"]
+    SC --> SSC
+    SA --> SSC
+  end
+
+  subgraph supabase["Supabase"]
+    AUTH["Supabase Auth<br/>JWT in cookie"]
+    API["PostgREST / Supabase client<br/>SELECT · INSERT · UPDATE · RPC"]
+    RLS["Row-Level Security<br/>policies on users · threads · messages"]
+    PG["PostgreSQL"]
+    RT["Realtime publication<br/>supabase_realtime · messages"]
+    RPC["SECURITY INVOKER RPCs<br/>create_thread_with_message<br/>claim_thread_for_responder<br/>send_message · close_thread"]
+    AUTH --> API
+    API --> RLS
+    RLS --> PG
+    RPC --> RLS
+    PG --> RT
+  end
+
+  browser -->|"HTTP / Server Actions"| MW
+  MW --> server
+  BC -->|"REST · Realtime WebSocket<br/>(matched threads)"| API
+  BC --> RT
+  SSC -->|"cookie-bound JWT"| AUTH
+  SSC --> API
+  RT -->|"INSERT events"| CC
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Trust boundaries and interview notes: [docs/architecture.md](docs/architecture.md).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Layer | Choice | Version |
+|-------|--------|---------|
+| Framework | Next.js (App Router) | 16.2.7 |
+| Language | TypeScript (strict) | ^5 |
+| UI | Tailwind CSS | ^4 |
+| Auth + DB + Realtime | Supabase (`@supabase/ssr`, `@supabase/supabase-js`) | ^0.10.3 / ^2.107.0 |
+| ORM / migrations | Drizzle ORM + Drizzle Kit | ^0.45.2 / ^0.31.10 |
+| Validation | Zod | ^4.4.3 |
+| Runtime | React | 19.2.4 |
+| Deploy target | Vercel | — |
 
-## Learn More
+## Local setup
 
-To learn more about Next.js, take a look at the following resources:
+1. Clone the repo and `cd paw2paw`
+2. `pnpm install`
+3. `cp .env.local.example .env.local` — fill in Supabase project URL (base URL, **no** `/rest/v1/`), publishable key, pooler URLs, and `SIGN_DISPLAY_ID_SECRET`
+4. `pnpm db:migrate`
+5. `pnpm dev` → [http://localhost:3000](http://localhost:3000)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+For local E2E testing, disable **Confirm email** in Supabase (Auth → Providers → Email). Re-enable before production deploy and verify confirmation email templates.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project structure
 
-## Deploy on Vercel
+```
+app/           # Routes, Server Components, Client Components, Server Actions
+lib/           # Supabase clients, auth, copy, validations, crisis, db schema
+docs/          # Architecture, security, decisions, E2E checklist, roadmap
+drizzle/       # SQL migrations (RLS, RPCs, realtime) — schema source of truth
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Roadmap
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Resume and shipping priorities: [docs/roadmap-resume.md](docs/roadmap-resume.md).
+
+## Security
+
+Threat model, RLS summary, and responsible disclosure: [SECURITY.md](SECURITY.md).
