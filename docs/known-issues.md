@@ -1,16 +1,55 @@
-# Known issues (deferred)
+# Known issues
 
-Tracked bugs and polish items intentionally deferred until after the MVP framework is complete. Add new entries at the bottom using the same template.
+Open items are triaged by roadmap priority. Resolved items are kept for history.
 
 ---
 
-## Auth signup — resolved (2025-06)
+## Open
+
+### No email or push notifications — **P2**
 
 | Field | Detail |
 |-------|--------|
-| **Symptom** | "Invalid path specified in request URL" error on `/signup` form submit |
-| **Root cause** | `NEXT_PUBLIC_SUPABASE_URL` set to the PostgREST URL (`…/rest/v1/`) instead of the base project URL |
-| **Fix** | `lib/supabase/normalize-url.ts` validates and rejects bad URLs at client init; env corrected to `https://<project-ref>.supabase.co` |
+| **Symptom** | Writers are not alerted when a thread is claimed or when a new message arrives |
+| **Surface** | Pending and inbox flows; users must check back manually |
+| **Mitigation** | Honest copy on pending page (`fix(copy)` pending); inbox lists all participant threads |
+| **Address in** | P2 — minimal match notification (email or Realtime on `threads.status`) per `docs/roadmap-resume.md` expansion |
+
+### Production deploy not live — **P0.2**
+
+| Field | Detail |
+|-------|--------|
+| **Symptom** | README shows “Live demo: coming soon” |
+| **Surface** | Recruiters and external reviewers |
+| **Address in** | P0.2 — Vercel deploy, env vars, prod `pnpm db:migrate`, update README with URL + Loom |
+
+### No automated tests or CI — **P1**
+
+| Field | Detail |
+|-------|--------|
+| **Symptom** | `pnpm lint` / `pnpm build` not enforced on push; no unit or E2E tests in repo |
+| **Surface** | Regression risk on auth, RLS-sensitive paths, crisis phrase detector |
+| **Address in** | P1 — GitHub Actions + focused tests per resume roadmap |
+
+### App shell and design system polish — **P2**
+
+| Field | Detail |
+|-------|--------|
+| **Symptom** | No persistent nav; `window.confirm` for end conversation; shadcn/ui not adopted |
+| **Surface** | General UX polish |
+| **Address in** | P2 — app shell, accessible dialogs, optional shadcn per `docs/roadmap-resume.md` |
+
+---
+
+## Resolved
+
+### ~~Auth signup — “Invalid path specified in request URL”~~ — **RESOLVED** `083c269`
+
+| Field | Detail |
+|-------|--------|
+| **Symptom** | Signup form returned “Invalid path specified in request URL” |
+| **Root cause** | `NEXT_PUBLIC_SUPABASE_URL` used PostgREST path (`…/rest/v1/`) instead of base project URL |
+| **Fix** | `lib/supabase/normalize-url.ts` fails loudly on bad URLs; env uses `https://<ref>.supabase.co` |
 | **Lesson learned** | Supabase shows the REST API URL prominently in the dashboard's API panel; the base URL is what we need. We added URL normalization to prevent this from happening again. |
 
 ---
@@ -18,13 +57,11 @@ Tracked bugs and polish items intentionally deferred until after the MVP framewo
 ## Template (copy for new entries)
 
 ```markdown
-## [Short title]
+### [Short title] — **P?**
 
 | Field | Detail |
 |-------|--------|
 | **Symptom** | |
 | **Surface** | |
-| **Suspected cause** | |
-| **Severity** | |
-| **Defer until** | |
+| **Address in** | |
 ```
