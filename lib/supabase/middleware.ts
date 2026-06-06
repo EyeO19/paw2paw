@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { needsOnboarding } from "@/lib/auth/onboarding";
+import { normalizeSupabaseUrl } from "@/lib/supabase/normalize-url";
 
 const PUBLIC_PATHS = new Set(["/", "/login", "/signup"]);
 
@@ -10,12 +11,13 @@ function isPublicPath(pathname: string): boolean {
 }
 
 export async function updateSession(request: NextRequest) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!url || !key) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !key) {
     return NextResponse.next({ request });
   }
+
+  const url = normalizeSupabaseUrl(process.env.NEXT_PUBLIC_SUPABASE_URL);
 
   let supabaseResponse = NextResponse.next({ request });
 

@@ -4,15 +4,14 @@ Tracked bugs and polish items intentionally deferred until after the MVP framewo
 
 ---
 
-## Auth signup
+## Auth signup — resolved (2025-06)
 
 | Field | Detail |
 |-------|--------|
 | **Symptom** | "Invalid path specified in request URL" error on `/signup` form submit |
-| **Surface** | Visible after typing email + password and clicking Sign up |
-| **Suspected cause** | Server Action path or Supabase redirect URL misconfig |
-| **Severity** | Blocking end-to-end signup, but not blocking MVP framework definition since auth works at data layer |
-| **Defer until** | Post–Chunk 5 polish pass |
+| **Root cause** | `NEXT_PUBLIC_SUPABASE_URL` set to the PostgREST URL (`…/rest/v1/`) instead of the base project URL |
+| **Fix** | `lib/supabase/normalize-url.ts` validates and rejects bad URLs at client init; env corrected to `https://<project-ref>.supabase.co` |
+| **Lesson learned** | Supabase shows the REST API URL prominently in the dashboard's API panel; the base URL is what we need. We added URL normalization to prevent this from happening again. |
 
 ---
 
