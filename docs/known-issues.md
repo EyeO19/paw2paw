@@ -39,6 +39,22 @@ Open items are triaged by roadmap priority. Resolved items are kept for history.
 | **Surface** | General UX polish |
 | **Address in** | P2 — app shell, accessible dialogs, optional shadcn per `docs/roadmap-resume.md` |
 
+### No route-level loading/error/not-found files — **P2**
+
+| Field | Detail |
+|-------|--------|
+| **Symptom** | No `loading.tsx`, `error.tsx`, or `not-found.tsx` in `app/`; async routes use inline form `pending` states and `notFound()` calls only |
+| **Surface** | Route transitions and unhandled server errors show Next.js defaults |
+| **Address in** | P2 — add per-route loading and error boundaries per project conventions |
+
+### Root layout metadata not updated — **P2**
+
+| Field | Detail |
+|-------|--------|
+| **Symptom** | `app/layout.tsx` `metadata` still shows create-next-app defaults ("Create Next App") |
+| **Surface** | Browser tab title and SEO snippets |
+| **Address in** | P2 polish — set title/description to Paw2Paw branding |
+
 ---
 
 ## Resolved
