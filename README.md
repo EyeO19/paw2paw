@@ -2,7 +2,7 @@
 
 **Status:** MVP in dev — production deploy in progress.
 
-Paw2Paw is an anonymous peer-support messaging platform for Princeton students. Marginalized students — first-gen, neurodivergent, students of color, student-athletes, LGBTQ+, international — get less mental health support at elite institutions because everyone assumes they're fine. Paw2Paw pairs students with peers who share their identity tags, anonymously, for one-to-one conversations with crisis resources always one tap away. Authorization is enforced at the database via Postgres RLS, not application code.
+Paw2Paw is an anonymous peer-support messaging platform for Princeton students. Marginalized students and communities — first-gen, neurodivergent, students of color, student-athletes, LGBTQ+, international, diabetic, disabled — get less mental health support at elite institutions because everyone assumes they have enough help. Paw2Paw works to pair students for one-to-one conversations with crisis resources always one tap away.
 
 **Live demo:** coming soon — URL and Loom walkthrough will be added after deploy.
 
