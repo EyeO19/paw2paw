@@ -6,6 +6,10 @@ Paw2Paw is an anonymous peer-support messaging platform for Princeton students. 
 
 **Live demo:** coming soon — URL and Loom walkthrough will be added after deploy.
 
+## Documentation
+
+Full walkthrough: [docs/codebase-walkthrough.md](docs/codebase-walkthrough.md)
+
 ## Architecture
 
 ```mermaid
