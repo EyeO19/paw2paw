@@ -6,10 +6,6 @@ Paw2Paw is an anonymous peer-support messaging platform for Princeton students. 
 
 **Live demo:** coming soon — URL and Loom walkthrough will be added after deploy.
 
-## Documentation
-
-- Codebase full index / glossary: [docs/codebase-full-index-glossary.md](docs/codebase-full-index-glossary.md)
-
 ## Architecture
 
 ```mermaid
@@ -55,20 +51,24 @@ flowchart TB
   RT -->|"INSERT events"| CC
 ```
 
-Trust boundaries and interview notes: [docs/architecture.md](docs/architecture.md).
+
+
+Trust boundaries and interview notes: `docs/architecture.md`.
 
 ## Tech stack
 
-| Layer | Choice | Version |
-|-------|--------|---------|
-| Framework | Next.js (App Router) | 16.2.7 |
-| Language | TypeScript (strict) | ^5 |
-| UI | Tailwind CSS | ^4 |
+
+| Layer                | Choice                                              | Version            |
+| -------------------- | --------------------------------------------------- | ------------------ |
+| Framework            | Next.js (App Router)                                | 16.2.7             |
+| Language             | TypeScript (strict)                                 | ^5                 |
+| UI                   | Tailwind CSS                                        | ^4                 |
 | Auth + DB + Realtime | Supabase (`@supabase/ssr`, `@supabase/supabase-js`) | ^0.10.3 / ^2.107.0 |
-| ORM / migrations | Drizzle ORM + Drizzle Kit | ^0.45.2 / ^0.31.10 |
-| Validation | Zod | ^4.4.3 |
-| Runtime | React | 19.2.4 |
-| Deploy target | Vercel | — |
+| ORM / migrations     | Drizzle ORM + Drizzle Kit                           | ^0.45.2 / ^0.31.10 |
+| Validation           | Zod                                                 | ^4.4.3             |
+| Runtime              | React                                               | 19.2.4             |
+| Deploy target        | Vercel                                              | —                  |
+
 
 ## Local setup
 
@@ -76,7 +76,7 @@ Trust boundaries and interview notes: [docs/architecture.md](docs/architecture.m
 2. `pnpm install`
 3. `cp .env.local.example .env.local` — fill in Supabase project URL (base URL, **no** `/rest/v1/`), publishable key, pooler URLs, and `SIGN_DISPLAY_ID_SECRET`
 4. `pnpm db:migrate`
-5. `pnpm dev` → [http://localhost:3000](http://localhost:3000)
+5. `pnpm dev` → http://localhost:3000
 
 For local E2E testing, disable **Confirm email** in Supabase (Auth → Providers → Email). Re-enable before production deploy and verify confirmation email templates.
 
@@ -89,14 +89,10 @@ docs/          # Architecture, security, decisions, E2E checklist, roadmap
 drizzle/       # SQL migrations (RLS, RPCs, realtime) — schema source of truth
 ```
 
-## Roadmap
-
-Resume and shipping priorities: [docs/roadmap-resume.md](docs/roadmap-resume.md).
-
 ## Security
 
-Threat model, RLS summary, and responsible disclosure: [SECURITY.md](SECURITY.md).
+Threat model, RLS summary, and responsible disclosure: `SECURITY.md`.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see `LICENSE`.
