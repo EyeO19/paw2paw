@@ -1,6 +1,6 @@
 # Architecture
 
-Package and platform definitions: [glossary.md](./glossary.md).
+Package and platform definitions: [codebase-walkthrough.md — Part 8](./codebase-walkthrough.md#part-8--tech-stack-glossary).
 
 ```mermaid
 flowchart TB
@@ -45,12 +45,12 @@ flowchart TB
   RT -->|"INSERT events"| CC
 ```
 
-Terms in the diagram — [Next.js](glossary.md#nextjs), [React](glossary.md#react), [@supabase/supabase-js](glossary.md#supabase-supabase-js), [Supabase](glossary.md#supabase), [PostgreSQL](glossary.md#postgresql), [Row-Level Security (RLS)](glossary.md#row-level-security-rls), and Supabase Realtime (see [Realtime](glossary.md#realtime)) — are defined in [glossary.md](./glossary.md).
+Terms in the diagram — [Next.js](codebase-walkthrough.md#nextjs), [React](codebase-walkthrough.md#react), [@supabase/supabase-js](codebase-walkthrough.md#supabasesupabase-js), [Supabase](codebase-walkthrough.md#supabase), [PostgreSQL](codebase-walkthrough.md#postgresql), [Row-Level Security (RLS)](codebase-walkthrough.md#row-level-security-rls), and Supabase Realtime (see [Realtime](codebase-walkthrough.md#realtime)) — are defined in [Part 8 of the codebase walkthrough](codebase-walkthrough.md#part-8--tech-stack-glossary).
 
 ## Trust boundaries
 
-**Client → server.** The browser holds only the publishable anon key and the user’s session cookie. [Client Components](glossary.md#nextjs) may call Server Actions or the browser [Supabase](glossary.md#supabase) client ([@supabase/supabase-js](glossary.md#supabase-supabase-js)); they never receive `SIGN_DISPLAY_ID_SECRET`, service-role keys, or direct Postgres URLs. Middleware refreshes the session and redirects unauthenticated or onboarding-incomplete users before protected routes render.
+**Client → server.** The browser holds only the publishable anon key and the user’s session cookie. [Client Components](codebase-walkthrough.md#nextjs) may call Server Actions or the browser [Supabase](codebase-walkthrough.md#supabase) client ([@supabase/supabase-js](codebase-walkthrough.md#supabasesupabase-js)); they never receive `SIGN_DISPLAY_ID_SECRET`, service-role keys, or direct Postgres URLs. Middleware refreshes the session and redirects unauthenticated or onboarding-incomplete users before protected routes render.
 
-**Server → database (RLS enforced).** Every query and RPC runs as the authenticated user (`auth.uid()`), not as a privileged application role. Authorization is enforced in [PostgreSQL](glossary.md#postgresql) policies and `SECURITY INVOKER` functions — [Row-Level Security (RLS)](glossary.md#row-level-security-rls) is the source of truth; the [Next.js](glossary.md#nextjs) layer validates input ([Zod](glossary.md#zod)) and maps errors, but does not decide who can read a thread or flag a message. A leaked anon key still cannot bypass RLS without a valid user JWT.
+**Server → database (RLS enforced).** Every query and RPC runs as the authenticated user (`auth.uid()`), not as a privileged application role. Authorization is enforced in [PostgreSQL](codebase-walkthrough.md#postgresql) policies and `SECURITY INVOKER` functions — [Row-Level Security (RLS)](codebase-walkthrough.md#row-level-security-rls) is the source of truth; the [Next.js](codebase-walkthrough.md#nextjs) layer validates input ([Zod](codebase-walkthrough.md#zod)) and maps errors, but does not decide who can read a thread or flag a message. A leaked anon key still cannot bypass RLS without a valid user JWT.
 
-**Database → realtime broadcast.** The `messages` table is on the `supabase_realtime` publication (migration `0009`). Inserts that pass RLS are broadcast to subscribed clients on `conversation:{threadId}`. Subscribers still only receive rows their JWT could have selected; Supabase Realtime (see [Realtime](glossary.md#realtime)) does not widen access beyond existing SELECT policies.
+**Database → realtime broadcast.** The `messages` table is on the `supabase_realtime` publication (migration `0009`). Inserts that pass RLS are broadcast to subscribed clients on `conversation:{threadId}`. Subscribers still only receive rows their JWT could have selected; Supabase Realtime (see [Realtime](codebase-walkthrough.md#realtime)) does not widen access beyond existing SELECT policies.
