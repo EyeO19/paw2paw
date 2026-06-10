@@ -34,6 +34,12 @@ yarn-error.log*
 .env*
 !.env.local.example
 
+# private docs (local only — not published to GitHub)
+docs/glossary.md
+docs/codebase-full-index.md
+docs/codebase-full-index-glossary.md
+docs/codebase-walkthrough.md
+
 # vercel
 .vercel
 
