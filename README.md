@@ -8,8 +8,7 @@ Paw2Paw is an anonymous peer-support messaging platform for Princeton students. 
 
 ## Documentation
 
-- Full walkthrough: [docs/codebase-walkthrough.md](docs/codebase-walkthrough.md) (includes Tech Stack Glossary as Part 8)
-- Glossary shortcut: [docs/glossary.md](docs/glossary.md)
+- Codebase full index / glossary: [docs/codebase-full-index-glossary.md](docs/codebase-full-index-glossary.md)
 
 ## Architecture
 

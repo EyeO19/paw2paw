@@ -103,6 +103,9 @@ Use two browser sessions (or normal + incognito) as **Writer** and **Responder**
 
 ## Sign-off
 
+
 | Tester | Date | Pass/Fail | Notes |
-|--------|------|-----------|-------|
+| ------ | ---- | --------- | ----- |
 |        |      |           |       |
+
+
