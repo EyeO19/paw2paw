@@ -1,6 +1,6 @@
 # Paw2Paw — Comprehensive Codebase Walkthrough
 
-This document is a self-contained guide to the Paw2Paw repository. A reader who has never opened a source file should be able to understand what the product is, how it works at runtime, and where every important file lives and why.
+This document is a self-contained guide to the Paw2Paw repository. A reader who has never opened a source file should be able to understand what the product is, how it works at runtime, and where every important file lives and why. For definitions of every platform and package (Supabase, Next.js, RLS, Zod, and the rest), see the [Tech Stack Glossary](./glossary.md).
 
 ---
 
