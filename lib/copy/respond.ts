@@ -3,15 +3,13 @@ export const respondCopy = {
     respondToSomeone: "Respond to someone",
   },
   respond: {
-    title: "Open conversations",
+    title: "Someone needs support",
+    assignmentIntro:
+      "You can support one person at a time. Here is a conversation chosen for you.",
     empty: "No conversations match your topics right now. Check back soon.",
-    respondButton: "Respond to this",
-    claiming: "Claiming…",
+    respondButton: "Start responding",
+    claiming: "Starting…",
     createdLabel: "Created",
-  },
-  optIn: {
-    title: "Opt in to respond",
-    body: "Turn on responder mode in settings to browse and claim conversations.",
   },
   thread: {
     matchedTitle: "Conversation matched",
@@ -25,5 +23,7 @@ export const respondCopy = {
     generic: "Something went wrong. Please try again.",
     unauthenticated: "You must be logged in to respond.",
     threadUnavailable: "This conversation is no longer available.",
+    activeEngagement:
+      "You're already supporting someone. Finish that conversation before responding to another.",
   },
 } as const;

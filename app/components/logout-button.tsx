@@ -6,7 +6,7 @@ export function LogoutButton() {
     <form action={signOut}>
       <button
         type="submit"
-        className="text-sm font-medium text-zinc-600 underline hover:text-zinc-900"
+        className="min-h-11 text-sm font-medium text-ink-tertiary underline decoration-border-default underline-offset-2 transition-colors duration-200 hover:text-ink-secondary"
       >
         {authCopy.logout.label}
       </button>

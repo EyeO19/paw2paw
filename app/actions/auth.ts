@@ -104,9 +104,8 @@ export async function completeOnboarding(
   formData: FormData,
 ): Promise<AuthActionState> {
   const topicTags = formData.getAll("topicTags").map(String);
-  const optInResponder = formData.get("optInResponder") === "on";
 
-  const parsed = onboardingSchema.safeParse({ topicTags, optInResponder });
+  const parsed = onboardingSchema.safeParse({ topicTags });
 
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? authCopy.errors.generic };
@@ -130,7 +129,7 @@ export async function completeOnboarding(
     .from("users")
     .update({
       topic_tags: parsed.data.topicTags,
-      opt_in_responder: parsed.data.optInResponder,
+      opt_in_responder: true,
     })
     .eq("id", user.id);
 
@@ -146,10 +145,9 @@ export async function updateProfile(
   formData: FormData,
 ): Promise<AuthActionState> {
   const topicTags = formData.getAll("topicTags").map(String);
-  const optInResponder = formData.get("optInResponder") === "on";
   const returnTo = safeInternalPath(formData.get("from"));
 
-  const parsed = onboardingSchema.safeParse({ topicTags, optInResponder });
+  const parsed = onboardingSchema.safeParse({ topicTags });
 
   if (!parsed.success) {
     return {
@@ -166,29 +164,16 @@ export async function updateProfile(
     redirect("/login");
   }
 
-  const { data: before } = await supabase
-    .from("users")
-    .select("opt_in_responder")
-    .eq("id", user.id)
-    .single();
-
   const { error } = await supabase
     .from("users")
     .update({
       topic_tags: parsed.data.topicTags,
-      opt_in_responder: parsed.data.optInResponder,
+      opt_in_responder: true,
     })
     .eq("id", user.id);
 
   if (error) {
     return { error: settingsCopy.errors.generic };
-  }
-
-  const wasOptedIn = Boolean(before?.opt_in_responder);
-  const nowOptedIn = parsed.data.optInResponder;
-
-  if (nowOptedIn && !wasOptedIn) {
-    redirect("/respond");
   }
 
   redirect(returnTo);

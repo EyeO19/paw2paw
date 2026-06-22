@@ -22,11 +22,9 @@ export const authCopy = {
   onboarding: {
     title: "Set up your profile",
     description:
-      "Choose topics you are comfortable discussing. You can opt in to respond to others.",
+      "Choose topics you are comfortable discussing. Everyone can respond to open conversations.",
     topicsLabel: "Topics",
     topicsHint: "Select 1–5 topics.",
-    optInLabel: "Opt in as a responder",
-    optInHint: "Allow others to match with you as a responder.",
     submit: "Continue",
     submitting: "Saving…",
   },

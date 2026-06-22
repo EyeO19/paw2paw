@@ -1,15 +1,19 @@
 export const inboxCopy = {
   home: {
-    myConversations: "My conversations",
+    currentConversations: "Current conversations",
   },
   inbox: {
-    title: "My conversations",
-    empty: "You have no conversations yet. Start one or respond when you're ready.",
+    title: "Current conversations",
+    empty: "You have no conversations yet. Share your first note or respond to someone.",
+    sectionStarted: "Messages you started",
+    sectionSupporting: "Conversations you're supporting",
     roleWriter: "You started this",
-    roleResponder: "You're supporting someone",
-    statusPending: "Waiting for a match",
+    roleResponder: "You're currently supporting someone",
+    roleResponderClosed:
+      "Thanks for supporting! Send a reminder in a couple days to see if they're okay.",
+    statusPendingWriter: "Your current message",
     statusMatched: "Active",
-    statusClosed: "Ended",
+    statusClosed: "Closed",
     updatedLabel: "Updated",
     homeLink: "Back home",
     newConversationLink: "Start a conversation",

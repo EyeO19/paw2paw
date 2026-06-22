@@ -13,6 +13,7 @@ const CLAIM_ERROR_CODES = [
   "self_match_forbidden",
   "opt_in_required",
   "already_claimed",
+  "active_responder_thread_exists",
 ] as const;
 
 function mapClaimRpcError(message: string): string {
@@ -20,6 +21,10 @@ function mapClaimRpcError(message: string): string {
 
   if (lower.includes("not_authenticated")) {
     return respondCopy.errors.unauthenticated;
+  }
+
+  if (lower.includes("active_responder_thread_exists")) {
+    return respondCopy.errors.activeEngagement;
   }
 
   if (CLAIM_ERROR_CODES.some((code) => lower.includes(code))) {

@@ -1,12 +1,7 @@
 export const crisisCopy = {
   strip: {
-    title: "If things feel urgent",
-    body: "Paw2Paw is peer support — not a crisis line. Help is available 24/7.",
-    call988: "Call or text 988",
-    call988Href: "tel:988",
-    learn988: "About 988",
-    learn988Href: "https://988lifeline.org/",
-    campusHeading: "Princeton resources",
+    title: "REMEMBER: If things feel urgent",
+    body: "Paw2Paw is a peer support platform, not a professional one — if a thread feels out of control, either: report the message, or redirect the conversation towards professional help.",
   },
   interstitial: {
     title: "Before you send",

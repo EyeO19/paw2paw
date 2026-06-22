@@ -1,6 +1,6 @@
-import Link from "next/link";
-
-import { formatTopicTagLabel } from "@/lib/constants/format-topic-tag";
+import { Badge } from "@/app/components/ui/badge";
+import { TopicBadge } from "@/app/components/ui/topic-badge";
+import { CardLink } from "@/app/components/ui/card";
 import { inboxCopy } from "@/lib/copy/inbox";
 
 export type InboxThreadItem = {
@@ -14,13 +14,31 @@ export type InboxThreadItem = {
 };
 
 type InboxListProps = {
-  threads: InboxThreadItem[];
+  started: InboxThreadItem[];
+  supporting: InboxThreadItem[];
 };
 
-function statusLabel(status: InboxThreadItem["status"]): string {
+function statusVariant(
+  status: InboxThreadItem["status"],
+): "status-pending" | "status-matched" | "status-closed" {
   switch (status) {
     case "pending":
-      return inboxCopy.inbox.statusPending;
+      return "status-pending";
+    case "matched":
+      return "status-matched";
+    case "closed":
+      return "status-closed";
+  }
+}
+
+function statusLabel(thread: InboxThreadItem): string {
+  if (thread.status === "pending" && thread.role === "writer") {
+    return inboxCopy.inbox.statusPendingWriter;
+  }
+
+  switch (thread.status) {
+    case "pending":
+      return inboxCopy.inbox.statusPendingWriter;
     case "matched":
       return inboxCopy.inbox.statusMatched;
     case "closed":
@@ -28,54 +46,85 @@ function statusLabel(status: InboxThreadItem["status"]): string {
   }
 }
 
-function roleLabel(role: InboxThreadItem["role"]): string {
-  return role === "writer"
-    ? inboxCopy.inbox.roleWriter
-    : inboxCopy.inbox.roleResponder;
-}
-
-export function InboxList({ threads }: InboxListProps) {
-  if (threads.length === 0) {
-    return (
-      <p className="text-center text-sm text-zinc-600">{inboxCopy.inbox.empty}</p>
-    );
+function roleLabel(thread: InboxThreadItem): string | null {
+  if (thread.role === "writer" && thread.status === "pending") {
+    return null;
   }
 
+  if (thread.role === "writer") {
+    return inboxCopy.inbox.roleWriter;
+  }
+
+  if (thread.status === "closed") {
+    return inboxCopy.inbox.roleResponderClosed;
+  }
+
+  return inboxCopy.inbox.roleResponder;
+}
+
+function ThreadCards({ threads }: { threads: InboxThreadItem[] }) {
   return (
     <ul className="flex flex-col gap-4">
-      {threads.map((thread) => (
+      {threads.map((thread) => {
+        const subtitle = roleLabel(thread);
+
+        return (
         <li key={thread.id}>
-          <Link
-            href={thread.href}
-            className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 transition-colors hover:bg-zinc-50"
-          >
+          <CardLink href={thread.href}>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-zinc-900 px-2 py-0.5 text-xs font-medium text-white">
-                {statusLabel(thread.status)}
-              </span>
-              <span className="text-xs text-zinc-500">{roleLabel(thread.role)}</span>
+              <Badge variant={statusVariant(thread.status)}>
+                {statusLabel(thread)}
+              </Badge>
+              {subtitle ? (
+                <span className="text-xs text-ink-tertiary">{subtitle}</span>
+              ) : null}
             </div>
             {thread.topicTags.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {thread.topicTags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs capitalize text-zinc-700"
-                  >
-                    {formatTopicTagLabel(tag)}
-                  </span>
+                  <TopicBadge key={tag} tag={tag} />
                 ))}
               </div>
             ) : null}
             {thread.preview ? (
-              <p className="line-clamp-2 text-sm text-zinc-800">{thread.preview}</p>
+              <p className="line-clamp-2 text-sm text-ink-primary">{thread.preview}</p>
             ) : null}
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-ink-tertiary">
               {inboxCopy.inbox.updatedLabel} {thread.updatedAgo}
             </p>
-          </Link>
+          </CardLink>
         </li>
-      ))}
+        );
+      })}
     </ul>
+  );
+}
+
+export function InboxList({ started, supporting }: InboxListProps) {
+  if (started.length === 0 && supporting.length === 0) {
+    return (
+      <p className="text-center text-sm text-ink-secondary">{inboxCopy.inbox.empty}</p>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-8">
+      {started.length > 0 ? (
+        <section className="flex flex-col gap-4">
+          <h2 className="font-display text-xl font-semibold text-ink-primary">
+            {inboxCopy.inbox.sectionStarted}
+          </h2>
+          <ThreadCards threads={started} />
+        </section>
+      ) : null}
+      {supporting.length > 0 ? (
+        <section className="flex flex-col gap-4">
+          <h2 className="font-display text-xl font-semibold text-ink-primary">
+            {inboxCopy.inbox.sectionSupporting}
+          </h2>
+          <ThreadCards threads={supporting} />
+        </section>
+      ) : null}
+    </div>
   );
 }

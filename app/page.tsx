@@ -1,11 +1,13 @@
-import Link from "next/link";
-
-import { LogoutButton } from "@/app/components/logout-button";
+import { HomeGuest, HomeMindMap } from "@/app/components/home-mind-map";
+import { GlassPage } from "@/app/components/glass/glass-page";
 import { needsOnboarding } from "@/lib/auth/onboarding";
-import { authCopy } from "@/lib/copy/auth";
-import { composeCopy } from "@/lib/copy/compose";
-import { inboxCopy } from "@/lib/copy/inbox";
-import { respondCopy } from "@/lib/copy/respond";
+import {
+  canCompose,
+  canStartWriterConversation,
+  getReciprocityStatus,
+} from "@/lib/auth/reciprocity";
+import { getActiveResponderThreadId } from "@/lib/inbox/get-active-responder-thread";
+import { getWriterOpenThreadCount } from "@/lib/inbox/get-writer-open-thread-count";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Home() {
@@ -14,62 +16,51 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let showNewConversation = false;
   let showRespond = false;
+  let canComposeNow = false;
+  let canStartNewConversation = false;
+  let writerOpenCount = 0;
+  let activeResponderThreadId: string | null = null;
 
   if (user) {
     const { data: profile } = await supabase
       .from("users")
-      .select("topic_tags, opt_in_responder")
+      .select("topic_tags")
       .eq("id", user.id)
       .maybeSingle();
 
     const onboarded = !needsOnboarding(profile);
-    showNewConversation = onboarded;
-    showRespond = onboarded && Boolean(profile?.opt_in_responder);
+    if (onboarded) {
+      const [reciprocity, responderThreadId, openCount] = await Promise.all([
+        getReciprocityStatus(supabase, user.id),
+        getActiveResponderThreadId(supabase, user.id),
+        getWriterOpenThreadCount(supabase, user.id),
+      ]);
+
+      showRespond = true;
+      canComposeNow = canCompose(reciprocity);
+      canStartNewConversation = canStartWriterConversation(
+        reciprocity,
+        openCount,
+      );
+      writerOpenCount = openCount;
+      activeResponderThreadId = responderThreadId;
+    }
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-8 px-4 py-16">
-      <h1 className="text-3xl font-semibold text-zinc-900">Paw2Paw</h1>
+    <GlassPage width="xl" shellClassName="py-6 md:py-10">
       {user ? (
-        <div className="flex flex-col items-center gap-4">
-          {showNewConversation ? (
-            <>
-              <Link
-                href="/compose"
-                className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white"
-              >
-                {composeCopy.home.newConversation}
-              </Link>
-              <Link
-                href="/inbox"
-                className="text-sm font-medium text-zinc-900 underline"
-              >
-                {inboxCopy.home.myConversations}
-              </Link>
-            </>
-          ) : null}
-          {showRespond ? (
-            <Link
-              href="/respond"
-              className="text-sm font-medium text-zinc-900 underline"
-            >
-              {respondCopy.home.respondToSomeone}
-            </Link>
-          ) : null}
-          <LogoutButton />
-        </div>
+        <HomeMindMap
+          showRespond={showRespond}
+          canCompose={canComposeNow}
+          canStartNewConversation={canStartNewConversation}
+          writerOpenCount={writerOpenCount}
+          activeResponderThreadId={activeResponderThreadId}
+        />
       ) : (
-        <nav className="flex gap-4 text-sm font-medium">
-          <Link href="/login" className="text-zinc-900 underline">
-            {authCopy.login.submit}
-          </Link>
-          <Link href="/signup" className="text-zinc-900 underline">
-            {authCopy.signup.submit}
-          </Link>
-        </nav>
+        <HomeGuest />
       )}
-    </div>
+    </GlassPage>
   );
 }

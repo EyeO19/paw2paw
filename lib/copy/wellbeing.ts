@@ -1,0 +1,21 @@
+export const wellbeingCopy = {
+  sendPrompt: "Send check-in",
+  sendingPrompt: "Sending…",
+  promptMessage: "Are you feeling better?",
+  waitingForResponse: "Waiting for a response to your check-in.",
+  respondLabel: "How are you feeling?",
+  thumbsUp: "Better",
+  thumbsDown: "Worse",
+  thumbsNeutral: "About the same",
+  responseRecorded: "Thanks for letting us know.",
+  reopenConversation: "Reopen conversation",
+  reopening: "Reopening…",
+  reopened: "Conversation reopened — you can send messages again.",
+  errors: {
+    generic: "Something went wrong. Please try again.",
+    unauthenticated: "You must be logged in to continue.",
+    promptFailed: "Couldn't send the check-in. Try again.",
+    respondFailed: "Couldn't record your response. Try again.",
+    reopenFailed: "Couldn't reopen the conversation. Try again.",
+  },
+} as const;

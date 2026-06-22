@@ -1,0 +1,204 @@
+{
+  "$meta": {
+    "name": "paw2paw-design-profile",
+    "version": "0.2.0",
+    "status": "active — typography wired in app/layout.tsx and app/globals.css",
+    "sourceTemplate": "Redo brand guidelines",
+    "intendedFor": "Cursor agent reference; pair with screen-level reference PNGs in design/",
+    "notes": [
+      "brand.* values are what Paw2Paw ships today.",
+      "template.redo.* documents the reference system; adopt gradually without changing copy or layout.",
+      "Avatar/contact-list paradigms from Redo do not apply — see warnings."
+    ],
+    "warnings": [
+      "Avatar paradigm assumes photo-based identities. Paw2Paw uses hashed display IDs + abstract generated avatars.",
+      "Contact-list paradigm does not apply. Repurpose list components as inbox/thread list only."
+    ]
+  },
+  "typography": {
+    "family": {
+      "display": "Red Hat Display, system-ui, sans-serif",
+      "body": "Red Hat Text, system-ui, sans-serif",
+      "mono": "ui-monospace, monospace"
+    },
+    "weight": {
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "scale": {
+      "display": { "size": "3rem", "lineHeight": "1.05", "weight": 700, "letterSpacing": "-0.02em" },
+      "h1": { "size": "2rem", "lineHeight": "1.15", "weight": 600, "letterSpacing": "-0.02em" },
+      "h2": { "size": "1.5rem", "lineHeight": "1.2", "weight": 600, "letterSpacing": "-0.01em" },
+      "h3": { "size": "1.25rem", "lineHeight": "1.3", "weight": 600 },
+      "body": { "size": "1rem", "lineHeight": "1.6", "weight": 400 },
+      "bodySmall": { "size": "0.875rem", "lineHeight": "1.5", "weight": 400 },
+      "caption": { "size": "0.75rem", "lineHeight": "1.4", "weight": 400 },
+      "label": { "size": "0.75rem", "lineHeight": "1.2", "weight": 600, "letterSpacing": "0.06em", "textTransform": "uppercase" },
+      "link": { "size": "0.875rem", "lineHeight": "1.4", "weight": 500, "textDecoration": "underline" }
+    },
+    "usage": {
+      "pageTitle": "display",
+      "sectionHeading": "h2",
+      "cardTitle": "h2",
+      "body": "body",
+      "formLabel": "bodySmall",
+      "metadata": "caption"
+    }
+  },
+  "color": {
+    "brand": {
+      "primary": {
+        "50": "#FFF4EC",
+        "100": "#FFE4D1",
+        "200": "#FFC9A3",
+        "300": "#FFAE76",
+        "400": "#FF9148",
+        "500": "#F47323",
+        "600": "#D85F18",
+        "700": "#B14B10",
+        "800": "#8A3A0C",
+        "900": "#5C2608"
+      },
+      "surface": {
+        "default": "#FFFFFF",
+        "muted": "#FAF6F1",
+        "subtle": "#F3EDE5"
+      },
+      "ink": {
+        "primary": "#1F1A14",
+        "secondary": "#4D4339",
+        "tertiary": "#7F7468",
+        "inverse": "#FFFFFF"
+      },
+      "feedback": {
+        "success": "#5E8C5C",
+        "warning": "#C68B3C",
+        "danger": "#B85450",
+        "info": "#6B7C8F",
+        "statusActive": "#CA8A04"
+      },
+      "border": {
+        "subtle": "#EAE3DA",
+        "default": "#D9CFC2",
+        "strong": "#A89B89"
+      }
+    },
+    "template": {
+      "redo": {
+        "primary": {
+          "orange": "#F7941D",
+          "steelBlue": "#B9C9D1",
+          "white": "#FFFFFF"
+        },
+        "secondary": {
+          "navy": "#1D3557",
+          "mediumBlue": "#457B9D",
+          "skyBlue": "#A8DADC",
+          "accentOrangeRed": "#E63946"
+        },
+        "neutral": {
+          "black": "#000000",
+          "gray": "#8E9AAF",
+          "lightGray": "#EDF2F4"
+        },
+        "gradient": {
+          "hero": {
+            "type": "linear",
+            "angle": "135deg",
+            "stops": [
+              { "color": "#B9C9D1", "position": "0%" },
+              { "color": "#F7941D", "position": "100%" }
+            ]
+          },
+          "mesh": {
+            "type": "mesh",
+            "colors": ["#F7941D", "#457B9D", "#A8DADC", "#E63946", "#1D3557"],
+            "blur": "80px",
+            "opacity": 0.35
+          }
+        }
+      }
+    }
+  },
+  "radius": {
+    "sm": "6px",
+    "md": "10px",
+    "lg": "16px",
+    "xl": "24px",
+    "pill": "9999px"
+  },
+  "shadow": {
+    "subtle": "0 1px 2px rgba(31, 26, 20, 0.04)",
+    "card": "0 2px 8px rgba(31, 26, 20, 0.06)",
+    "modal": "0 8px 24px rgba(31, 26, 20, 0.08)",
+    "focus": "0 0 0 3px rgba(244, 115, 35, 0.25)"
+  },
+  "motion": {
+    "ease": {
+      "standard": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "entrance": "cubic-bezier(0, 0, 0.2, 1)"
+    },
+    "duration": {
+      "fast": "180ms",
+      "medium": "280ms"
+    }
+  },
+  "glass": {
+    "panel": {
+      "background": "rgba(255, 255, 255, 0.6)",
+      "backdropBlur": "24px",
+      "border": "rgba(255, 255, 255, 0.5)"
+    },
+    "strip": {
+      "background": "rgba(243, 237, 229, 0.5)",
+      "backdropBlur": "12px",
+      "border": "rgba(234, 227, 218, 0.6)"
+    },
+    "ambientBlob": {
+      "blur": "64px",
+      "opacity": 0.35
+    }
+  },
+  "layout": {
+    "breakpoint": {
+      "tablet": "768px",
+      "desktop": "1024px",
+      "wide": "1280px"
+    },
+    "pageWidth": {
+      "sm": "24rem",
+      "md": "28rem",
+      "lg": "32rem",
+      "xl": "64rem"
+    },
+    "spacing": {
+      "pagePaddingX": "1rem",
+      "pagePaddingY": "2.5rem",
+      "sectionGap": "1.5rem",
+      "cardPadding": "1.5rem"
+    }
+  },
+  "component": {
+    "button": {
+      "radius": "sm",
+      "minHeight": "2.75rem",
+      "fontWeight": 600
+    },
+    "card": {
+      "radius": "lg",
+      "borderWidth": "2px",
+      "shadow": "card"
+    },
+    "input": {
+      "radius": "sm",
+      "borderColor": "border.default"
+    },
+    "conversationPanel": {
+      "minHeightMobile": "70dvh",
+      "minHeightDesktop": "75dvh",
+      "messageRadius": "lg"
+    }
+  }
+}

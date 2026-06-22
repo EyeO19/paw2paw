@@ -21,6 +21,14 @@ function mapRpcError(message: string): string {
     return composeCopy.errors.unauthenticated;
   }
 
+  if (lower.includes("respond_first_required")) {
+    return composeCopy.errors.respondFirst;
+  }
+
+  if (lower.includes("writer_open_limit_reached")) {
+    return composeCopy.errors.writerLimit;
+  }
+
   if (RPC_VALIDATION_CODES.some((code) => lower.includes(code))) {
     return composeCopy.errors.generic;
   }
@@ -56,7 +64,7 @@ export async function createThread(
   const { data: threadId, error } = await supabase.rpc(
     "create_thread_with_message",
     {
-      p_topic_tags: parsed.data.topicTags,
+      p_topic_tags: [...parsed.data.topicTags].sort(),
       p_content: parsed.data.content,
     },
   );

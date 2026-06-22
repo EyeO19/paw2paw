@@ -1,7 +1,14 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import { formatTopicTagLabel } from "@/lib/constants/format-topic-tag";
+import { ReciprocityGate } from "@/app/components/reciprocity-gate";
+import { TopicBadge } from "@/app/components/ui/topic-badge";
+import {
+  PageDescription,
+  PageShell,
+  PageTitle,
+  TextLink,
+} from "@/app/components/ui/page-shell";
+import { getReciprocityStatus } from "@/lib/auth/reciprocity";
 import { composeCopy } from "@/lib/copy/compose";
 import { createClient } from "@/lib/supabase/server";
 
@@ -43,45 +50,32 @@ export default async function ThreadPendingPage({ params }: PendingPageProps) {
   }
 
   const topicTags: string[] = thread.topic_tags ?? [];
+  const reciprocity = await getReciprocityStatus(supabase, user.id);
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-4 py-16">
-      <div className="flex w-full max-w-md flex-col gap-6 text-center">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-semibold text-zinc-900">
-            {composeCopy.pending.title}
-          </h1>
-          <p className="text-sm text-zinc-600">{composeCopy.pending.body}</p>
-        </div>
-        {topicTags.length > 0 ? (
-          <div className="flex flex-col gap-2">
-            <h2 className="text-sm font-medium text-zinc-900">
-              {composeCopy.pending.topicsLabel}
-            </h2>
-            <ul className="flex flex-wrap justify-center gap-2">
-              {topicTags.map((tag) => (
-                <li
-                  key={tag}
-                  className="rounded-full bg-zinc-100 px-3 py-1 text-sm capitalize text-zinc-800"
-                >
-                  {formatTopicTagLabel(tag)}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-        <div className="flex flex-col items-center gap-2 text-sm">
-          <Link
-            href="/inbox"
-            className="font-medium text-zinc-900 underline"
-          >
-            {composeCopy.pending.inboxLink}
-          </Link>
-          <Link href="/" className="text-zinc-600 underline">
-            {composeCopy.pending.homeLink}
-          </Link>
-        </div>
+    <PageShell>
+      <div className="flex flex-col gap-2 text-center">
+        <PageTitle>{composeCopy.pending.title}</PageTitle>
+        <PageDescription>{composeCopy.pending.body}</PageDescription>
       </div>
-    </div>
+      {topicTags.length > 0 ? (
+        <div className="flex flex-col items-center gap-2">
+          <h2 className="text-sm font-medium text-ink-primary">
+            {composeCopy.pending.topicsLabel}
+          </h2>
+          <ul className="flex flex-wrap justify-center gap-2">
+            {topicTags.map((tag) => (
+              <li key={tag}>
+                <TopicBadge tag={tag} className="px-3 py-1 text-sm" />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      {reciprocity.requiresReciprocity ? <ReciprocityGate /> : null}
+      <div className="flex flex-col items-center gap-2 text-sm">
+        <TextLink href="/inbox">{composeCopy.pending.inboxLink}</TextLink>
+      </div>
+    </PageShell>
   );
 }

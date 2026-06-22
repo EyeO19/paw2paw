@@ -1,13 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState, startTransition } from "react";
 
 import { CrisisInterstitial } from "@/app/components/crisis-interstitial";
-import { CrisisResourceStrip } from "@/app/components/crisis-resource-strip";
+import { Button } from "@/app/components/ui/button";
+import { TopicBadge } from "@/app/components/ui/topic-badge";
+import {
+  Checkbox,
+  FieldError,
+  FieldHint,
+  Textarea,
+} from "@/app/components/ui/input";
 import { createThread, type CreateThreadResult } from "@/app/actions/thread";
+import { ResourceBridge } from "@/app/thread/[id]/resource-bridge";
 import { TOPIC_TAGS, type TopicTag } from "@/lib/constants/topic-tags";
-import { formatTopicTagLabel } from "@/lib/constants/format-topic-tag";
 import { useCrisisSendGate } from "@/lib/crisis/use-crisis-send-gate";
 import { composeCopy } from "@/lib/copy/compose";
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
@@ -30,6 +37,7 @@ type ComposeFormProps = {
 export function ComposeForm({ suggestedTags }: ComposeFormProps) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const submitInFlightRef = useRef(false);
   const [state, formAction, pending] = useActionState(createThread, initialState);
   const [content, setContent] = useState("");
   const orderedTags = orderTopicTags(suggestedTags);
@@ -37,12 +45,15 @@ export function ComposeForm({ suggestedTags }: ComposeFormProps) {
   const hasSuggestions = suggestedTags.length > 0;
 
   const submitContent = (trimmed: string) => {
-    if (!formRef.current) {
+    if (!formRef.current || pending || submitInFlightRef.current) {
       return;
     }
+    submitInFlightRef.current = true;
     const formData = new FormData(formRef.current);
     formData.set("content", trimmed);
-    formAction(formData);
+    startTransition(() => {
+      formAction(formData);
+    });
   };
 
   const {
@@ -56,6 +67,12 @@ export function ComposeForm({ suggestedTags }: ComposeFormProps) {
     onProceed: submitContent,
     onClearComposer: () => setContent(""),
   });
+
+  useEffect(() => {
+    if ("ok" in state && state.ok === false) {
+      submitInFlightRef.current = false;
+    }
+  }, [state]);
 
   useEffect(() => {
     if ("ok" in state && state.ok === true) {
@@ -85,12 +102,12 @@ export function ComposeForm({ suggestedTags }: ComposeFormProps) {
           requestSend(content);
         }}
       >
-        <CrisisResourceStrip surface="compose" />
+        <ResourceBridge />
         <fieldset className="flex flex-col gap-3">
-          <legend className="text-sm font-medium text-zinc-900">
+          <legend className="text-sm font-medium text-ink-primary">
             {composeCopy.compose.topicsLabel}
           </legend>
-          <p className="text-sm text-zinc-600">{composeCopy.compose.topicsHint}</p>
+          <FieldHint>{composeCopy.compose.topicsHint}</FieldHint>
           <div className="flex flex-col gap-2">
             {orderedTags.map((tag, index) => {
               const isSuggested = suggestedSet.has(tag);
@@ -100,29 +117,24 @@ export function ComposeForm({ suggestedTags }: ComposeFormProps) {
               return (
                 <div key={tag} className="flex flex-col gap-1">
                   {showSuggestedHint ? (
-                    <span className="text-xs font-medium text-zinc-500">
+                    <span className="text-xs font-medium text-ink-tertiary">
                       {composeCopy.compose.suggestedHint}
                     </span>
                   ) : null}
-                  <label className="flex items-center gap-2 text-sm text-zinc-800">
-                    <input
-                      type="checkbox"
-                      name="topicTags"
-                      value={tag}
-                      className="size-4 rounded border-zinc-300"
-                    />
-                    <span className="capitalize">{formatTopicTagLabel(tag)}</span>
+                  <label className="flex min-h-11 items-center gap-3 text-sm">
+                    <Checkbox type="checkbox" name="topicTags" value={tag} />
+                    <TopicBadge tag={tag} className="text-sm" />
                   </label>
                 </div>
               );
             })}
           </div>
         </fieldset>
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-zinc-900">
+        <label className="flex flex-col">
+          <span className="mb-2 text-sm font-medium text-ink-primary">
             {composeCopy.compose.contentLabel}
           </span>
-          <textarea
+          <Textarea
             name="content"
             rows={8}
             required
@@ -131,21 +143,12 @@ export function ComposeForm({ suggestedTags }: ComposeFormProps) {
             placeholder={composeCopy.compose.contentPlaceholder}
             aria-invalid={Boolean(error)}
             onChange={(event) => setContent(event.target.value)}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-zinc-900"
           />
         </label>
-        {error ? (
-          <p className="text-sm text-red-600" role="alert">
-            {error}
-          </p>
-        ) : null}
-        <button
-          type="submit"
-          disabled={pending || content.trim().length === 0}
-          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-        >
+        {error ? <FieldError>{error}</FieldError> : null}
+        <Button type="submit" disabled={pending || content.trim().length === 0}>
           {pending ? composeCopy.compose.submitting : composeCopy.compose.submit}
-        </button>
+        </Button>
       </form>
     </>
   );

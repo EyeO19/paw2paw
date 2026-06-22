@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CrisisInterstitial } from "@/app/components/crisis-interstitial";
 import { CrisisResourceStrip } from "@/app/components/crisis-resource-strip";
+import { ReciprocityGate } from "@/app/components/reciprocity-gate";
 import { flagMessage, sendMessage } from "@/app/actions/conversation";
 import { Composer } from "@/app/thread/[id]/composer";
 import { Message } from "@/app/thread/[id]/message";
+import { WellbeingCheck } from "@/app/thread/[id]/wellbeing-check";
 import { useCrisisSendGate } from "@/lib/crisis/use-crisis-send-gate";
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 import { trackEvent } from "@/lib/analytics/track";
@@ -18,6 +20,7 @@ import {
   type ConversationMessage,
 } from "@/lib/conversation/message-types";
 import { conversationCopy } from "@/lib/copy/conversation";
+import type { WellbeingState } from "@/lib/conversation/wellbeing";
 import { createClient } from "@/lib/supabase/client";
 import { isNearBottom, scrollToBottom } from "@/lib/utils/scroll-helpers";
 
@@ -26,6 +29,9 @@ type ConversationViewProps = {
   currentUserId: string;
   initialMessages: ConversationMessage[];
   threadStatus: "matched" | "closed";
+  requiresReciprocity: boolean;
+  initialWellbeing: WellbeingState;
+  onReopened: () => void;
 };
 
 type MessageRow = {
@@ -42,6 +48,9 @@ export function ConversationView({
   currentUserId,
   initialMessages,
   threadStatus,
+  requiresReciprocity,
+  initialWellbeing,
+  onReopened,
 }: ConversationViewProps) {
   const [messages, setMessages] = useState(() =>
     [...initialMessages].sort(sortMessages),
@@ -244,7 +253,7 @@ export function ConversationView({
       />
       {toast ? (
         <div
-          className="flex items-center justify-between gap-3 border-b border-zinc-200 bg-zinc-100 px-4 py-2 text-sm text-zinc-800"
+          className="flex items-center justify-between gap-3 border-b border-border-subtle/60 bg-surface-subtle/70 px-4 py-2 text-sm text-ink-secondary backdrop-blur-sm"
           role="status"
         >
           <span>{toast}</span>
@@ -259,7 +268,7 @@ export function ConversationView({
       ) : null}
       {isClosed ? (
         <div
-          className="border-b border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+          className="border-b border-warning/30 bg-warning/10 px-4 py-3 text-sm text-ink-primary backdrop-blur-sm"
           role="status"
         >
           {conversationCopy.thread.endedBanner}
@@ -267,7 +276,7 @@ export function ConversationView({
       ) : null}
       <div
         ref={scrollRef}
-        className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4"
+        className="relative z-0 min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4"
       >
         {messages.map((message) => (
           <Message
@@ -281,20 +290,33 @@ export function ConversationView({
         ))}
       </div>
       {!isClosed ? (
-        <>
-          <div className="border-t border-zinc-200 px-4 pt-4">
-            <CrisisResourceStrip surface="conversation" threadId={threadId} />
+        <div className="shrink-0 border-t border-border-subtle bg-surface-subtle">
+          <div className="px-4 pt-4">
+            <CrisisResourceStrip />
           </div>
-          <Composer
-            disabled={false}
-            isSubmitting={isSubmitting}
-            onSend={requestSend}
-            onRegisterClear={(clear) => {
-              clearComposerRef.current = clear;
-            }}
-          />
-        </>
-      ) : null}
+          {requiresReciprocity ? (
+            <div className="p-4">
+              <ReciprocityGate />
+            </div>
+          ) : (
+            <Composer
+              disabled={false}
+              isSubmitting={isSubmitting}
+              onSend={requestSend}
+              onRegisterClear={(clear) => {
+                clearComposerRef.current = clear;
+              }}
+            />
+          )}
+        </div>
+      ) : (
+        <WellbeingCheck
+          threadId={threadId}
+          currentUserId={currentUserId}
+          initialState={initialWellbeing}
+          onReopened={onReopened}
+        />
+      )}
     </div>
   );
 }

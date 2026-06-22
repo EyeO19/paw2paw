@@ -5,6 +5,7 @@ import { useState } from "react";
 import { conversationCopy } from "@/lib/copy/conversation";
 import type { ConversationMessage } from "@/lib/conversation/message-types";
 import { formatRelativeTime } from "@/lib/utils/relative-time";
+import { cn } from "@/lib/design/cn";
 
 type MessageProps = {
   message: ConversationMessage;
@@ -43,21 +44,22 @@ export function Message({
   };
 
   return (
-    <div
-      className={`flex w-full ${isMine ? "justify-end" : "justify-start"}`}
-    >
+    <div className={cn("flex w-full", isMine ? "justify-end" : "justify-start")}>
       <div
-        className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
+        className={cn(
+          "max-w-[75%] rounded-lg px-4 py-3 text-sm",
           isMine
-            ? "bg-zinc-900 text-white"
-            : "border border-zinc-200 bg-white text-zinc-900"
-        } ${isSending ? "opacity-70" : ""}`}
+            ? "bg-primary-500 text-ink-inverse"
+            : "border border-white/60 bg-surface-muted/55 text-ink-primary backdrop-blur-sm",
+          isSending && "opacity-70",
+        )}
       >
-        <p className="whitespace-pre-wrap break-words">{message.content}</p>
+        <p className="break-words whitespace-pre-wrap">{message.content}</p>
         <div
-          className={`mt-1 flex flex-wrap items-center gap-2 text-xs ${
-            isMine ? "text-zinc-300" : "text-zinc-500"
-          }`}
+          className={cn(
+            "mt-1 flex flex-wrap items-center gap-2 text-xs",
+            isMine ? "text-primary-100" : "text-ink-tertiary",
+          )}
         >
           <span>
             {isSending

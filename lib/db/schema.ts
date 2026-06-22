@@ -16,6 +16,12 @@ export const threadStatusEnum = pgEnum("thread_status", [
   "closed",
 ]);
 
+export const wellbeingResponseEnum = pgEnum("wellbeing_response", [
+  "up",
+  "down",
+  "neutral",
+]);
+
 export const users = pgTable(
   "users",
   {
@@ -24,7 +30,7 @@ export const users = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    optInResponder: boolean("opt_in_responder").default(false).notNull(),
+    optInResponder: boolean("opt_in_responder").default(true).notNull(),
     topicTags: text("topic_tags")
       .array()
       .default(sql`'{}'::text[]`)
@@ -53,6 +59,23 @@ export const threads = pgTable(
       .array()
       .default(sql`'{}'::text[]`)
       .notNull(),
+    wellbeingPromptSentAt: timestamp("wellbeing_prompt_sent_at", {
+      withTimezone: true,
+      mode: "string",
+    }),
+    wellbeingPromptSenderId: uuid("wellbeing_prompt_sender_id").references(
+      () => users.id,
+      { onDelete: "restrict" },
+    ),
+    wellbeingResponse: wellbeingResponseEnum("wellbeing_response"),
+    wellbeingRespondedBy: uuid("wellbeing_responded_by").references(
+      () => users.id,
+      { onDelete: "restrict" },
+    ),
+    wellbeingRespondedAt: timestamp("wellbeing_responded_at", {
+      withTimezone: true,
+      mode: "string",
+    }),
   },
   (table) => [
     index("threads_status_created_at_idx").on(table.status, table.createdAt),

@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type KeyboardEvent } from "react";
 
+import { Button } from "@/app/components/ui/button";
+import { Textarea } from "@/app/components/ui/input";
 import { conversationCopy } from "@/lib/copy/conversation";
 
 const MAX_LENGTH = 10_000;
@@ -42,12 +44,12 @@ export function Composer({
   };
 
   return (
-    <div className="border-t border-zinc-200 bg-white p-4">
+    <div className="p-4">
       <label className="sr-only" htmlFor="message-composer">
         {conversationCopy.composer.label}
       </label>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
-        <textarea
+        <Textarea
           id="message-composer"
           name="content"
           rows={3}
@@ -57,18 +59,17 @@ export function Composer({
           placeholder={conversationCopy.composer.placeholder}
           onChange={(event) => setValue(event.target.value)}
           onKeyDown={handleKeyDown}
-          className="min-h-[4.5rem] flex-1 resize-none rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900"
+          className="min-h-[4.5rem] flex-1 resize-none"
         />
-        <button
+        <Button
           type="button"
           onClick={handleSend}
           disabled={disabled || isSubmitting || value.trim().length === 0}
-          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
         >
           {isSubmitting
             ? conversationCopy.composer.sending
             : conversationCopy.composer.send}
-        </button>
+        </Button>
       </div>
     </div>
   );

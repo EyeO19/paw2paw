@@ -1,20 +1,21 @@
 import { redirect } from "next/navigation";
 
-import { OptInPrompt } from "@/app/respond/opt-in-prompt";
-import { RespondList, type RespondThreadItem } from "@/app/respond/respond-list";
+import {
+  RespondAssignment,
+  type RespondAssignmentItem,
+} from "@/app/respond/respond-assignment";
+import { PageShell, PageTitle } from "@/app/components/ui/page-shell";
 import { ensureUserProfile } from "@/lib/auth/ensure-user-profile";
 import { needsOnboarding } from "@/lib/auth/onboarding";
+import { getActiveResponderThreadId } from "@/lib/inbox/get-active-responder-thread";
+import {
+  loadRespondThreads,
+  respondPreview,
+} from "@/lib/inbox/load-respond-threads";
+import { pickRandomRespondThread } from "@/lib/inbox/pick-random-respond-thread";
 import { respondCopy } from "@/lib/copy/respond";
-import { firstMessagePreview } from "@/lib/utils/message-preview";
 import { formatRelativeTime } from "@/lib/utils/relative-time";
 import { createClient } from "@/lib/supabase/server";
-
-type ThreadRow = {
-  id: string;
-  created_at: string;
-  topic_tags: string[] | null;
-  messages: { content: string; created_at: string }[] | null;
-};
 
 export default async function RespondPage() {
   const supabase = await createClient();
@@ -33,7 +34,7 @@ export default async function RespondPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("topic_tags, opt_in_responder")
+    .select("topic_tags")
     .eq("id", user.id)
     .single();
 
@@ -41,46 +42,48 @@ export default async function RespondPage() {
     redirect("/onboarding");
   }
 
-  if (!profile?.opt_in_responder) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center px-4 py-16">
-        <OptInPrompt optInResponder={false} />
-      </div>
-    );
+  const activeThreadId = await getActiveResponderThreadId(supabase, user.id);
+  if (activeThreadId) {
+    redirect(`/thread/${activeThreadId}`);
   }
 
-  const userTopicTags = profile.topic_tags ?? [];
+  const userTopicTags = profile?.topic_tags ?? [];
 
-  const { data: rows, error } = await supabase
-    .from("threads")
-    .select("id, created_at, topic_tags, messages(content, created_at)")
-    .eq("status", "pending")
-    .neq("writer_id", user.id)
-    .overlaps("topic_tags", userTopicTags)
-    .order("created_at", { ascending: true })
-    .limit(20);
+  const { threads: rows, error } = await loadRespondThreads(
+    supabase,
+    userTopicTags,
+    user.id,
+    50,
+  );
 
   if (error) {
     throw new Error("Failed to load open conversations");
   }
 
-  const threads: RespondThreadItem[] = ((rows ?? []) as ThreadRow[]).map(
-    (row) => ({
-      id: row.id,
-      topicTags: row.topic_tags ?? [],
-      preview: firstMessagePreview(row.messages),
-      createdAgo: formatRelativeTime(row.created_at),
-    }),
-  );
+  const assignmentRow = pickRandomRespondThread(rows);
+
+  if (!assignmentRow) {
+    return (
+      <PageShell width="lg">
+        <PageTitle>{respondCopy.respond.title}</PageTitle>
+        <p className="text-center text-sm text-ink-secondary">
+          {respondCopy.respond.empty}
+        </p>
+      </PageShell>
+    );
+  }
+
+  const assignment: RespondAssignmentItem = {
+    id: assignmentRow.id,
+    topicTags: assignmentRow.topic_tags ?? [],
+    preview: respondPreview(assignmentRow.messages),
+    createdAgo: formatRelativeTime(assignmentRow.created_at),
+  };
 
   return (
-    <div className="flex flex-1 flex-col items-center px-4 py-16">
-      <div className="flex w-full max-w-lg flex-col gap-6">
-        <h1 className="text-2xl font-semibold text-zinc-900">
-          {respondCopy.respond.title}
-        </h1>
-        <RespondList threads={threads} />
-      </div>
-    </div>
+    <PageShell width="lg">
+      <PageTitle>{respondCopy.respond.title}</PageTitle>
+      <RespondAssignment assignment={assignment} />
+    </PageShell>
   );
 }

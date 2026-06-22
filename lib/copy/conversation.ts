@@ -1,3 +1,5 @@
+import { reciprocityCopy } from "@/lib/copy/reciprocity";
+
 export const conversationCopy = {
   resources: {
     summary: "Campus resources",
@@ -8,8 +10,9 @@ export const conversationCopy = {
     ending: "Ending…",
     confirmEnd:
       "End this conversation? You'll still be able to read history but no new messages can be sent.",
+    cancelEnd: "Cancel",
     endedBanner:
-      "This conversation has ended. History remains visible.",
+      "This conversation is closed. History remains visible.",
     homeLink: "Back home",
   },
   composer: {
@@ -39,6 +42,7 @@ export const conversationCopy = {
     generic: "Something went wrong. Please try again.",
     unauthenticated: "You must be logged in to continue.",
     sendFailed: "Couldn't send. Try again.",
+    respondFirst: reciprocityCopy.gateBody,
     endFailed: "Couldn't end the conversation. Try again.",
   },
 } as const;

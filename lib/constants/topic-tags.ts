@@ -4,6 +4,7 @@ export const TOPIC_TAGS = [
   "identity",
   "mental-health",
   "academics",
+  "athletics",
   "relationships",
   "campus-life",
   "family",

@@ -3,6 +3,9 @@
 import { useState, useTransition } from "react";
 
 import { endConversation } from "@/app/actions/conversation";
+import { Button } from "@/app/components/ui/button";
+import { Dialog } from "@/app/components/ui/dialog";
+import { FieldError } from "@/app/components/ui/input";
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 import { trackEvent } from "@/lib/analytics/track";
 import { conversationCopy } from "@/lib/copy/conversation";
@@ -16,15 +19,11 @@ export function EndConversationButton({
   threadId,
   onEnded,
 }: EndConversationButtonProps) {
+  const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [isPending, startTransition] = useTransition();
 
-  const handleClick = () => {
-    const confirmed = window.confirm(conversationCopy.thread.confirmEnd);
-    if (!confirmed) {
-      return;
-    }
-
+  const handleConfirm = () => {
     setError(undefined);
     startTransition(async () => {
       const result = await endConversation({ threadId });
@@ -33,27 +32,40 @@ export function EndConversationButton({
         return;
       }
       trackEvent(ANALYTICS_EVENTS.conversationEnded, { thread_id: threadId });
+      setOpen(false);
       onEnded();
     });
   };
 
   return (
-    <div className="flex flex-col items-end gap-1">
-      <button
-        type="button"
-        onClick={handleClick}
-        disabled={isPending}
-        className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-800 disabled:opacity-60"
-      >
-        {isPending
-          ? conversationCopy.thread.ending
-          : conversationCopy.thread.endConversation}
-      </button>
-      {error ? (
-        <p className="text-xs text-red-600" role="alert">
-          {error}
-        </p>
-      ) : null}
-    </div>
+    <>
+      <div className="flex flex-col items-end gap-1">
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          onClick={() => setOpen(true)}
+          disabled={isPending}
+        >
+          {isPending
+            ? conversationCopy.thread.ending
+            : conversationCopy.thread.endConversation}
+        </Button>
+        {error ? (
+          <FieldError className="text-xs">{error}</FieldError>
+        ) : null}
+      </div>
+      <Dialog
+        open={open}
+        title={conversationCopy.thread.endConversation}
+        description={conversationCopy.thread.confirmEnd}
+        cancelLabel={conversationCopy.thread.cancelEnd}
+        confirmLabel={conversationCopy.thread.endConversation}
+        confirmVariant="destructive"
+        isPending={isPending}
+        onCancel={() => setOpen(false)}
+        onConfirm={handleConfirm}
+      />
+    </>
   );
 }

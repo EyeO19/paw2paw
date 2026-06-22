@@ -4,8 +4,9 @@ import { useState } from "react";
 
 import { ConversationView } from "@/app/thread/[id]/conversation-view";
 import { EndConversationButton } from "@/app/thread/[id]/end-conversation-button";
-import { formatTopicTagLabel } from "@/lib/constants/format-topic-tag";
+import { TopicBadge } from "@/app/components/ui/topic-badge";
 import type { ConversationMessage } from "@/lib/conversation/message-types";
+import type { WellbeingState } from "@/lib/conversation/wellbeing";
 
 type ConversationShellProps = {
   threadId: string;
@@ -13,6 +14,8 @@ type ConversationShellProps = {
   initialMessages: ConversationMessage[];
   initialStatus: "matched" | "closed";
   topicTags: string[];
+  requiresReciprocity: boolean;
+  initialWellbeing: WellbeingState;
 };
 
 export function ConversationShell({
@@ -21,20 +24,21 @@ export function ConversationShell({
   initialMessages,
   initialStatus,
   topicTags,
+  requiresReciprocity,
+  initialWellbeing,
 }: ConversationShellProps) {
   const [threadStatus, setThreadStatus] = useState(initialStatus);
 
   return (
-    <div className="flex min-h-[70dvh] flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white md:min-h-[75dvh]">
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
+    <div
+      className="flex h-[min(82dvh,calc(100dvh-8rem))] w-full flex-col rounded-md border border-white/60 bg-surface shadow-card"
+    >
+      <header
+        className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border-subtle bg-surface-subtle px-4 py-3"
+      >
         <div className="flex flex-wrap gap-2">
           {topicTags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs capitalize text-zinc-700"
-            >
-              {formatTopicTagLabel(tag)}
-            </span>
+            <TopicBadge key={tag} tag={tag} />
           ))}
         </div>
         {threadStatus === "matched" ? (
@@ -49,6 +53,9 @@ export function ConversationShell({
         currentUserId={currentUserId}
         initialMessages={initialMessages}
         threadStatus={threadStatus}
+        requiresReciprocity={requiresReciprocity}
+        initialWellbeing={initialWellbeing}
+        onReopened={() => setThreadStatus("matched")}
       />
     </div>
   );

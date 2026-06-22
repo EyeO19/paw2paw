@@ -31,7 +31,7 @@ export async function ensureUserProfile(
   const { error: insertError } = await supabase.from("users").insert({
     id: authUserId,
     hashed_display_id: hashDisplayId(authUserId),
-    opt_in_responder: false,
+    opt_in_responder: true,
     topic_tags: [],
   });
 

@@ -1,14 +1,15 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { ConversationShell } from "@/app/thread/[id]/conversation-shell";
 import { ResourceBridge } from "@/app/thread/[id]/resource-bridge";
+import { AmbientBackground } from "@/app/components/glass/ambient-background";
+import { getReciprocityStatus } from "@/lib/auth/reciprocity";
 import {
   mapRowToMessage,
   sortMessages,
   type ConversationMessage,
 } from "@/lib/conversation/message-types";
-import { conversationCopy } from "@/lib/copy/conversation";
+import { mapWellbeingRow } from "@/lib/conversation/wellbeing";
 import { createClient } from "@/lib/supabase/server";
 
 type ThreadPageProps = {
@@ -37,7 +38,9 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
 
   const { data: thread } = await supabase
     .from("threads")
-    .select("id, status, topic_tags, writer_id, responder_id")
+    .select(
+      "id, status, topic_tags, writer_id, responder_id, wellbeing_prompt_sent_at, wellbeing_prompt_sender_id, wellbeing_response, wellbeing_responded_by",
+    )
     .eq("id", id)
     .maybeSingle();
 
@@ -71,31 +74,23 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
 
   const topicTags: string[] = thread.topic_tags ?? [];
   const conversationStatus = thread.status as "matched" | "closed";
+  const reciprocity = await getReciprocityStatus(supabase, user.id);
+  const wellbeing = mapWellbeingRow(thread);
 
   return (
-    <div className="flex min-h-full flex-col px-4 py-4 md:py-6">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
-        <div className="md:hidden">
-          <ResourceBridge />
-        </div>
-        <div className="grid gap-4 md:grid-cols-[1fr_16rem] md:gap-6">
-          <ConversationShell
-            threadId={id}
-            currentUserId={user.id}
-            initialMessages={initialMessages}
-            initialStatus={conversationStatus}
-            topicTags={topicTags}
-          />
-          <div className="hidden md:block">
-            <ResourceBridge />
-          </div>
-        </div>
-        <Link
-          href="/"
-          className="text-sm font-medium text-zinc-900 underline"
-        >
-          {conversationCopy.thread.homeLink}
-        </Link>
+    <div className="relative isolate flex min-h-[calc(100dvh-4.5rem)] flex-col items-center justify-center px-4 py-6">
+      <AmbientBackground />
+      <div className="relative z-10 flex w-full max-w-3xl flex-col gap-4">
+        <ConversationShell
+          threadId={id}
+          currentUserId={user.id}
+          initialMessages={initialMessages}
+          initialStatus={conversationStatus}
+          topicTags={topicTags}
+          requiresReciprocity={reciprocity.requiresReciprocity}
+          initialWellbeing={wellbeing}
+        />
+        <ResourceBridge />
       </div>
     </div>
   );

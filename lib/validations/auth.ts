@@ -14,7 +14,6 @@ export const signInSchema = z.object({
 
 export const onboardingSchema = z.object({
   topicTags: topicTagsSchema,
-  optInResponder: z.boolean(),
 });
 
 export type SignUpInput = z.infer<typeof signUpSchema>;

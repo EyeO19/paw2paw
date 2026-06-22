@@ -1,10 +1,13 @@
 "use server";
 
 import { conversationCopy } from "@/lib/copy/conversation";
+import { wellbeingCopy } from "@/lib/copy/wellbeing";
 import {
   endConversationSchema,
   flagMessageSchema,
   sendMessageSchema,
+  wellbeingResponseSchema,
+  wellbeingThreadSchema,
 } from "@/lib/validations/conversation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -17,6 +20,8 @@ export type EndConversationResult =
   | { ok: false; error: string };
 
 export type FlagMessageResult = { ok: true } | { ok: false; error: string };
+
+export type WellbeingActionResult = { ok: true } | { ok: false; error: string };
 
 const SEND_ERROR_CODES = [
   "not_authenticated",
@@ -38,6 +43,10 @@ function mapSendRpcError(message: string): string {
 
   if (lower.includes("not_authenticated")) {
     return conversationCopy.errors.unauthenticated;
+  }
+
+  if (lower.includes("respond_first_required")) {
+    return conversationCopy.errors.respondFirst;
   }
 
   if (SEND_ERROR_CODES.some((code) => lower.includes(code))) {
@@ -167,6 +176,104 @@ export async function flagMessage(input: {
 
   if (!updated) {
     return { ok: false, error: conversationCopy.report.toastError };
+  }
+
+  return { ok: true };
+}
+
+export async function sendWellbeingPrompt(input: {
+  threadId: string;
+}): Promise<WellbeingActionResult> {
+  const parsed = wellbeingThreadSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? wellbeingCopy.errors.generic,
+    };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: wellbeingCopy.errors.unauthenticated };
+  }
+
+  const { error } = await supabase.rpc("send_wellbeing_prompt", {
+    p_thread_id: parsed.data.threadId,
+  });
+
+  if (error) {
+    return { ok: false, error: wellbeingCopy.errors.promptFailed };
+  }
+
+  return { ok: true };
+}
+
+export async function respondWellbeingCheck(input: {
+  threadId: string;
+  response: "up" | "down" | "neutral";
+}): Promise<WellbeingActionResult> {
+  const parsed = wellbeingResponseSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? wellbeingCopy.errors.generic,
+    };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: wellbeingCopy.errors.unauthenticated };
+  }
+
+  const { error } = await supabase.rpc("respond_wellbeing_check", {
+    p_thread_id: parsed.data.threadId,
+    p_response: parsed.data.response,
+  });
+
+  if (error) {
+    return { ok: false, error: wellbeingCopy.errors.respondFailed };
+  }
+
+  return { ok: true };
+}
+
+export async function reopenConversation(input: {
+  threadId: string;
+}): Promise<WellbeingActionResult> {
+  const parsed = wellbeingThreadSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? wellbeingCopy.errors.generic,
+    };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: wellbeingCopy.errors.unauthenticated };
+  }
+
+  const { error } = await supabase.rpc("reopen_thread", {
+    p_thread_id: parsed.data.threadId,
+  });
+
+  if (error) {
+    return { ok: false, error: wellbeingCopy.errors.reopenFailed };
   }
 
   return { ok: true };
