@@ -54,45 +54,51 @@ export function Dialog({
   }
 
   return createPortal(
-    <div
-      className="fixed inset-0 z-[200] flex min-h-[100dvh] w-full items-center justify-center bg-ink-primary/60 p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="dialog-title"
-      onClick={onCancel}
-    >
+    <>
       <div
-        className="w-full max-w-[480px] rounded-xl bg-surface p-8 shadow-modal"
-        onClick={(event) => event.stopPropagation()}
+        className="fixed inset-0 z-[200] bg-ink-primary/85"
+        aria-hidden="true"
+        onClick={onCancel}
+      />
+      <div
+        className="fixed inset-0 z-[201] flex items-center justify-center p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dialog-title"
       >
-        <h2
-          id="dialog-title"
-          className="font-display text-lg font-semibold text-ink-primary"
+        <div
+          className="w-full max-w-[480px] rounded-xl bg-surface p-8 shadow-modal"
+          onClick={(event) => event.stopPropagation()}
         >
-          {title}
-        </h2>
-        {description ? (
-          <div className="mt-3 text-sm leading-relaxed text-ink-secondary">
-            {description}
-          </div>
-        ) : null}
-        {disclaimer ? (
-          <p className="mt-2 text-xs text-ink-tertiary">{disclaimer}</p>
-        ) : null}
-        <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
-          <Button variant="secondary" onClick={onCancel} disabled={isPending}>
-            {cancelLabel}
-          </Button>
-          <Button
-            variant={confirmVariant}
-            onClick={onConfirm}
-            disabled={isPending}
+          <h2
+            id="dialog-title"
+            className="font-display text-lg font-semibold text-ink-primary"
           >
-            {confirmLabel}
-          </Button>
+            {title}
+          </h2>
+          {description ? (
+            <div className="mt-3 text-sm leading-relaxed text-ink-secondary">
+              {description}
+            </div>
+          ) : null}
+          {disclaimer ? (
+            <p className="mt-2 text-xs text-ink-tertiary">{disclaimer}</p>
+          ) : null}
+          <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
+            <Button variant="secondary" onClick={onCancel} disabled={isPending}>
+              {cancelLabel}
+            </Button>
+            <Button
+              variant={confirmVariant}
+              onClick={onConfirm}
+              disabled={isPending}
+            >
+              {confirmLabel}
+            </Button>
+          </div>
         </div>
       </div>
-    </div>,
+    </>,
     document.body,
   );
 }

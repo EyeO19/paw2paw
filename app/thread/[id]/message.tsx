@@ -50,7 +50,7 @@ export function Message({
           "max-w-[75%] rounded-lg px-4 py-3 text-sm",
           isMine
             ? "bg-primary-500 text-ink-inverse"
-            : "border border-white/60 bg-surface-muted/55 text-ink-primary backdrop-blur-sm",
+            : "border border-border-subtle bg-surface-subtle text-ink-primary",
           isSending && "opacity-70",
         )}
       >

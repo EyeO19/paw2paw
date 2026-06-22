@@ -95,7 +95,7 @@ export function WellbeingCheck({
   };
 
   return (
-    <div className="border-t border-border-subtle/60 bg-surface/55 px-4 py-4 backdrop-blur-md">
+    <div className="border-t border-border-subtle bg-surface-subtle px-4 py-4">
       {error ? (
         <p className="mb-3 text-sm text-danger" role="alert">
           {error}

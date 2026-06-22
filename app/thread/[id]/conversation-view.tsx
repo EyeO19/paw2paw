@@ -253,7 +253,7 @@ export function ConversationView({
       />
       {toast ? (
         <div
-          className="flex items-center justify-between gap-3 border-b border-border-subtle/60 bg-surface-subtle/70 px-4 py-2 text-sm text-ink-secondary backdrop-blur-sm"
+          className="flex items-center justify-between gap-3 border-b border-border-subtle bg-surface-subtle px-4 py-2 text-sm text-ink-secondary"
           role="status"
         >
           <span>{toast}</span>
@@ -268,7 +268,7 @@ export function ConversationView({
       ) : null}
       {isClosed ? (
         <div
-          className="border-b border-warning/30 bg-warning/10 px-4 py-3 text-sm text-ink-primary backdrop-blur-sm"
+          className="border-b border-warning/30 bg-warning/10 px-4 py-3 text-sm text-ink-primary"
           role="status"
         >
           {conversationCopy.thread.endedBanner}
@@ -276,7 +276,7 @@ export function ConversationView({
       ) : null}
       <div
         ref={scrollRef}
-        className="relative z-0 min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4"
+        className="relative z-0 min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pt-5 pb-4"
       >
         {messages.map((message) => (
           <Message

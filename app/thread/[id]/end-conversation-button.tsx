@@ -39,7 +39,9 @@ export function EndConversationButton({
 
   return (
     <>
-      <div className="flex flex-col items-end gap-1">
+      <div
+        className={open ? "hidden" : "flex flex-col items-end gap-1"}
+      >
         <Button
           type="button"
           variant="destructive"
