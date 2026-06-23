@@ -17,5 +17,4 @@ export const topicTagSchema = z.enum(TOPIC_TAGS);
 
 export const topicTagsSchema = z
   .array(topicTagSchema)
-  .min(1, "Select at least one topic")
-  .max(5, "Select at most five topics");
+  .min(1, "Select at least one topic");

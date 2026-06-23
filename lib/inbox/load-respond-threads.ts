@@ -19,18 +19,16 @@ export type RespondThreadWithMessages = RespondThreadRow & {
   messages: MessagePreviewRow[];
 };
 
-export async function loadRespondThreads(
+export async function loadOpenRespondThreads(
   supabase: SupabaseClient,
-  topicTags: string[],
   excludeWriterId: string,
-  limit = 20,
+  limit = 50,
 ): Promise<{ threads: RespondThreadWithMessages[]; error: Error | null }> {
   const { data: threadRows, error: threadError } = await supabase
     .from("threads")
     .select("id, created_at, topic_tags")
     .eq("status", "pending")
     .neq("writer_id", excludeWriterId)
-    .overlaps("topic_tags", topicTags)
     .order("created_at", { ascending: true })
     .limit(limit);
 

@@ -5,7 +5,7 @@ export const composeCopy = {
   compose: {
     title: "Start a conversation",
     topicsLabel: "Topics",
-    topicsHint: "Choose 1–5 topics. Tags from your profile are listed first.",
+    topicsHint: "Choose one or more topics. Tags from your profile are listed first.",
     suggestedHint: "From your profile",
     contentLabel: "Your message",
     contentPlaceholder: "Write what you want to share…",

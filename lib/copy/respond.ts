@@ -4,9 +4,9 @@ export const respondCopy = {
   },
   respond: {
     title: "Someone needs support",
-    assignmentIntro:
-      "You can support one person at a time. Here is a conversation chosen for you.",
-    empty: "No conversations match your topics right now. Check back soon.",
+    listIntro:
+      "You can support one person at a time. These open conversations are waiting for a response.",
+    empty: "No open conversations right now. Check back soon.",
     respondButton: "Start responding",
     claiming: "Starting…",
     createdLabel: "Created",

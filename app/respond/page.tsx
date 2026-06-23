@@ -1,21 +1,32 @@
 import { redirect } from "next/navigation";
 
 import {
-  RespondAssignment,
-  type RespondAssignmentItem,
-} from "@/app/respond/respond-assignment";
+  RespondOpenList,
+  type RespondOpenItem,
+} from "@/app/respond/respond-open-list";
 import { PageShell, PageTitle } from "@/app/components/ui/page-shell";
 import { ensureUserProfile } from "@/lib/auth/ensure-user-profile";
 import { needsOnboarding } from "@/lib/auth/onboarding";
 import { getActiveResponderThreadId } from "@/lib/inbox/get-active-responder-thread";
 import {
-  loadRespondThreads,
+  loadOpenRespondThreads,
   respondPreview,
+  type RespondThreadWithMessages,
 } from "@/lib/inbox/load-respond-threads";
-import { pickRandomRespondThread } from "@/lib/inbox/pick-random-respond-thread";
 import { respondCopy } from "@/lib/copy/respond";
 import { formatRelativeTime } from "@/lib/utils/relative-time";
 import { createClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
+
+function toOpenItem(row: RespondThreadWithMessages): RespondOpenItem {
+  return {
+    id: row.id,
+    topicTags: row.topic_tags ?? [],
+    preview: respondPreview(row.messages),
+    createdAgo: formatRelativeTime(row.created_at),
+  };
+}
 
 export default async function RespondPage() {
   const supabase = await createClient();
@@ -47,43 +58,24 @@ export default async function RespondPage() {
     redirect(`/thread/${activeThreadId}`);
   }
 
-  const userTopicTags = profile?.topic_tags ?? [];
-
-  const { threads: rows, error } = await loadRespondThreads(
-    supabase,
-    userTopicTags,
-    user.id,
-    50,
-  );
+  const { threads, error } = await loadOpenRespondThreads(supabase, user.id, 50);
 
   if (error) {
     throw new Error("Failed to load open conversations");
   }
 
-  const assignmentRow = pickRandomRespondThread(rows);
-
-  if (!assignmentRow) {
-    return (
-      <PageShell width="lg">
-        <PageTitle>{respondCopy.respond.title}</PageTitle>
-        <p className="text-center text-sm text-ink-secondary">
-          {respondCopy.respond.empty}
-        </p>
-      </PageShell>
-    );
-  }
-
-  const assignment: RespondAssignmentItem = {
-    id: assignmentRow.id,
-    topicTags: assignmentRow.topic_tags ?? [],
-    preview: respondPreview(assignmentRow.messages),
-    createdAgo: formatRelativeTime(assignmentRow.created_at),
-  };
+  const openItems = threads.map(toOpenItem);
 
   return (
     <PageShell width="lg">
       <PageTitle>{respondCopy.respond.title}</PageTitle>
-      <RespondAssignment assignment={assignment} />
+      {openItems.length === 0 ? (
+        <p className="text-center text-sm text-ink-secondary">
+          {respondCopy.respond.empty}
+        </p>
+      ) : (
+        <RespondOpenList items={openItems} />
+      )}
     </PageShell>
   );
 }

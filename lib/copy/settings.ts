@@ -2,7 +2,7 @@ export const settingsCopy = {
   title: "Settings",
   description: "Update your topic tags.",
   topicsLabel: "Topics",
-  topicsHint: "Select 1–5 topics.",
+  topicsHint: "Select one or more topics.",
   submit: "Save changes",
   submitting: "Saving…",
   homeLink: "Back home",

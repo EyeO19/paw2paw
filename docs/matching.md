@@ -9,7 +9,7 @@ Paw2Paw uses a simple **FIFO queue** for responders browsing open threads.
 - Thread must be `status = pending` with `responder_id` null.
 - Responder cannot be the writer (`writer_id <> auth.uid()`).
 - Responder must have `opt_in_responder = true`.
-- **Tag overlap:** `users.topic_tags && threads.topic_tags` (Postgres array overlap).
+- **Browse:** `/respond` lists all open pending threads (oldest first); no topic filtering.
 - **Order:** `created_at ASC` (oldest waiting thread first).
 - **Cap:** 20 threads per `/respond` load (no pagination in MVP).
 - **Claim:** `claim_thread_for_responder` RPC sets `responder_id` and `status = matched` in one `UPDATE` with a race guard (`ROW_COUNT = 0` → `already_claimed`).
@@ -22,7 +22,7 @@ Paw2Paw uses a simple **FIFO queue** for responders browsing open threads.
 
 ### Browse + claim security
 
-- RLS policies `threads_select_claimable` and `messages_select_on_claimable_thread` allow opted-in responders to see only eligible pending threads (and messages on those threads for preview).
+- RLS policies `threads_select_claimable` and `messages_select_on_claimable_thread` allow opted-in responders to see eligible pending threads (and messages on those threads for preview), regardless of topic overlap.
 - Claim runs as `SECURITY INVOKER` under `threads_claim_as_responder` with `WITH CHECK (status = 'matched')`.
 
 ---

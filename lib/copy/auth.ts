@@ -24,7 +24,7 @@ export const authCopy = {
     description:
       "Choose topics you are comfortable discussing. Everyone can respond to open conversations.",
     topicsLabel: "Topics",
-    topicsHint: "Select 1–5 topics.",
+    topicsHint: "Select one or more topics.",
     submit: "Continue",
     submitting: "Saving…",
   },
